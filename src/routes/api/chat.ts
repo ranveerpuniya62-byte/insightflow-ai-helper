@@ -112,7 +112,7 @@ export const Route = createFileRoute("/api/chat")({
                 });
                 const { data: msgs } = await supabase.from("chat_messages")
                   .select("id").eq("thread_id", threadId).order("created_at").limit(3);
-                const patch: Record<string, string> = { updated_at: new Date().toISOString() };
+                const patch: { updated_at: string; title?: string } = { updated_at: new Date().toISOString() };
                 if ((msgs?.length ?? 0) <= 3) patch.title = content.slice(0, 60);
                 await supabase.from("chat_threads").update(patch).eq("id", threadId);
               }
