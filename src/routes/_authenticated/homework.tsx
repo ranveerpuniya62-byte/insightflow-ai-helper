@@ -10,15 +10,12 @@ import { answerHomework } from "@/lib/ai.functions";
 import { Markdown } from "@/components/markdown";
 import { toast } from "sonner";
 import { Image as ImageIcon, X, BookOpen } from "lucide-react";
+import { compressImage } from "@/lib/image";
 
 export const Route = createFileRoute("/_authenticated/homework")({
   component: Homework,
   head: () => ({ meta: [{ title: "Homework Helper — AI Study Chat" }] }),
 });
-
-async function fileToDataUrl(f: File): Promise<string> {
-  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(f); });
-}
 
 function Homework() {
   const [subject, setSubject] = useState("Math");
@@ -36,7 +33,7 @@ function Homework() {
   async function pickImage(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; if (!f) return;
     if (f.size > 10 * 1024 * 1024) return toast.error("Image too large");
-    setImage(await fileToDataUrl(f));
+    setImage(await compressImage(f));
   }
 
   return (

@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/app-shell";
-import { getThread, sendChatMessage } from "@/lib/chat.functions";
+import { getThread } from "@/lib/chat.functions";
 import { suggestFollowups } from "@/lib/ai.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,52 +10,99 @@ import { useEffect, useRef, useState } from "react";
 import { Markdown } from "@/components/markdown";
 import { toast } from "sonner";
 import { ArrowLeft, Send, Image as ImageIcon, X } from "lucide-react";
+import { compressImage } from "@/lib/image";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   component: ChatThread,
   head: () => ({ meta: [{ title: "Chat — AI Study Chat" }] }),
 });
 
-async function fileToDataUrl(f: File): Promise<string> {
-  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(f); });
-}
-
 function ChatThread() {
   const { threadId } = Route.useParams();
   const getFn = useServerFn(getThread);
-  const sendFn = useServerFn(sendChatMessage);
   const suggestFn = useServerFn(suggestFollowups);
   const qc = useQueryClient();
   const { data } = useQuery({ queryKey: ["thread", threadId], queryFn: () => getFn({ data: { id: threadId } }) });
   const [input, setInput] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [pending, setPending] = useState(false);
+  const [optimisticUser, setOptimisticUser] = useState<string | null>(null);
+  const [streaming, setStreaming] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const messages = data?.messages ?? [];
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, streaming, optimisticUser]);
 
-  const send = useMutation({
-    mutationFn: async () => {
-      const content = input.trim(); if (!content) throw new Error("Empty");
-      setInput(""); const img = image; setImage(null);
-      await sendFn({ data: { threadId, content, imageDataUrl: img || undefined } });
-    },
-    onSuccess: async () => {
-      qc.invalidateQueries({ queryKey: ["thread", threadId] });
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  async function send() {
+    const content = input.trim();
+    if (!content || pending) return;
+    const img = image;
+    setInput("");
+    setImage(null);
+    setSuggestions([]);
+    setOptimisticUser(content);
+    setStreaming("");
+    setPending(true);
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) throw new Error("Not signed in");
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ threadId, content, imageDataUrl: img || undefined }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok || !res.body) {
+        const t = await res.text();
+        throw new Error(t || `Error ${res.status}`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(value, { stream: true });
+        setStreaming(acc);
+      }
+
+      await qc.invalidateQueries({ queryKey: ["thread", threadId] });
       qc.invalidateQueries({ queryKey: ["credits"] });
-      // suggestions
-      const ctx = messages.slice(-6).map((m) => `${m.role}: ${m.content}`).join("\n") + `\nuser: ${input}`;
-      try { const r = await suggestFn({ data: { context: ctx } }); setSuggestions(r.suggestions); } catch {}
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+
+      const ctx = messages.slice(-6).map((m) => `${m.role}: ${m.content}`).join("\n") + `\nuser: ${content}\nassistant: ${acc}`;
+      suggestFn({ data: { context: ctx } }).then((r) => setSuggestions(r.suggestions)).catch(() => {});
+    } catch (e) {
+      const err = e as Error;
+      if (err.name !== "AbortError") toast.error(err.message);
+    } finally {
+      setPending(false);
+      setOptimisticUser(null);
+      setStreaming("");
+      abortRef.current = null;
+    }
+  }
 
   async function pickImage(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0]; if (!f) return;
+    const f = e.target.files?.[0];
+    if (!f) return;
     if (f.size > 10 * 1024 * 1024) return toast.error("Image too large (10 MB max)");
-    setImage(await fileToDataUrl(f));
+    setImage(await compressImage(f));
   }
 
   return (
@@ -67,7 +114,7 @@ function ChatThread() {
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="mx-auto max-w-3xl space-y-4">
-            {messages.length === 0 && (
+            {messages.length === 0 && !optimisticUser && (
               <div className="text-center text-muted-foreground py-16">
                 Ask me anything about your studies. Attach an image if helpful.
               </div>
@@ -79,8 +126,29 @@ function ChatThread() {
                 </div>
               </div>
             ))}
-            {send.isPending && <div className="text-sm text-muted-foreground animate-pulse">Thinking…</div>}
-            {suggestions.length > 0 && !send.isPending && (
+            {optimisticUser && (
+              <div className="flex justify-end">
+                <div className="max-w-[85%] rounded-2xl px-4 py-3 gradient-bg text-white">
+                  <div className="text-sm whitespace-pre-wrap">{optimisticUser}</div>
+                </div>
+              </div>
+            )}
+            {pending && (
+              <div className="flex justify-start">
+                <div className="max-w-[85%] rounded-2xl px-4 py-3 glass">
+                  {streaming ? (
+                    <Markdown>{streaming}</Markdown>
+                  ) : (
+                    <div className="flex gap-1 items-center h-5">
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "120ms" }} />
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "240ms" }} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            {suggestions.length > 0 && !pending && (
               <div className="glass rounded-2xl p-4">
                 <div className="text-xs font-semibold text-muted-foreground mb-2">You may also ask:</div>
                 <div className="flex flex-wrap gap-2">
@@ -108,11 +176,11 @@ function ChatThread() {
               </label>
               <Textarea
                 value={input} onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!send.isPending) send.mutate(); } }}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
                 placeholder="Ask anything…" rows={1}
                 className="flex-1 border-0 bg-transparent resize-none focus-visible:ring-0 min-h-[40px] max-h-40"
               />
-              <Button size="icon" className="gradient-bg text-white border-0" disabled={send.isPending || !input.trim()} onClick={() => send.mutate()}>
+              <Button size="icon" className="gradient-bg text-white border-0" disabled={pending || !input.trim()} onClick={send}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>

@@ -9,15 +9,12 @@ import { useState } from "react";
 import { Markdown } from "@/components/markdown";
 import { toast } from "sonner";
 import { ScanLine, Upload } from "lucide-react";
+import { compressImage } from "@/lib/image";
 
 export const Route = createFileRoute("/_authenticated/analyze")({
   component: Analyze,
   head: () => ({ meta: [{ title: "Image Analysis — AI Study Chat" }] }),
 });
-
-async function fileToDataUrl(f: File): Promise<string> {
-  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(f); });
-}
 
 function Analyze() {
   const [image, setImage] = useState<string | null>(null);
@@ -34,7 +31,7 @@ function Analyze() {
   async function pick(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]; if (!f) return;
     if (f.size > 10 * 1024 * 1024) return toast.error("Image too large");
-    setImage(await fileToDataUrl(f));
+    setImage(await compressImage(f));
   }
 
   return (
