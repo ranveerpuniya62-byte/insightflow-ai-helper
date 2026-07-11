@@ -57,6 +57,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+        <Link to="/upgrade" className="mb-2 flex items-center gap-2 rounded-lg gradient-bg px-3 py-2 text-sm font-medium text-white shadow-glow">
+          <Crown className="h-4 w-4" /> Upgrade Plan
+        </Link>
         <Button variant="ghost" size="sm" className="justify-start" onClick={signOut}><LogOut className="h-4 w-4 mr-2" /> Sign out</Button>
       </aside>
 
@@ -72,7 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 min-w-0">{children}</main>
 
         <nav className="md:hidden sticky bottom-0 z-30 grid grid-cols-5 border-t border-border/50 bg-background/80 backdrop-blur">
-          {nav.slice(0, 5).map((n) => {
+          {mobileNav.map((n) => {
             const active = pathname === n.to || pathname.startsWith(n.to + "/");
             return (
               <Link key={n.to} to={n.to} className={`flex flex-col items-center gap-0.5 py-2 text-[10px] ${active ? "text-primary" : "text-muted-foreground"}`}>
