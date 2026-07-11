@@ -3,9 +3,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/app-shell";
 import { getCredits } from "@/lib/credits.functions";
-import { MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, Settings } from "lucide-react";
+import { MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, Settings, Crown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -19,6 +20,7 @@ const cards = [
   { to: "/generate", icon: ImageIcon, title: "Image Generator", desc: "Create study visuals from text", gradient: "from-orange-500 to-pink-500" },
   { to: "/history", icon: History, title: "History", desc: "Revisit past sessions", gradient: "from-slate-500 to-slate-700" },
   { to: "/profile", icon: User, title: "Profile", desc: "Account and preferences", gradient: "from-indigo-500 to-purple-500" },
+  { to: "/settings", icon: Settings, title: "Settings", desc: "Theme, language, and more", gradient: "from-pink-500 to-rose-500" },
 ] as const;
 
 function useCountdown(iso?: string) {
