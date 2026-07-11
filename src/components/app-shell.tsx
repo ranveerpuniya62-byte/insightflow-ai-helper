@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { Home, MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, LogOut, Sparkles } from "lucide-react";
+import { Home, MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, LogOut, Sparkles, Settings, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -13,6 +13,15 @@ const nav = [
   { to: "/generate", label: "Generate", icon: ImageIcon },
   { to: "/history", label: "History", icon: History },
   { to: "/profile", label: "Profile", icon: User },
+  { to: "/settings", label: "Settings", icon: Settings },
+] as const;
+
+const mobileNav = [
+  { to: "/dashboard", label: "Home", icon: Home },
+  { to: "/chat", label: "Chat", icon: MessageSquare },
+  { to: "/history", label: "History", icon: History },
+  { to: "/profile", label: "Profile", icon: User },
+  { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
