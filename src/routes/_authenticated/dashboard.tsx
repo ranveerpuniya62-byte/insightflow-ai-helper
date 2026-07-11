@@ -3,9 +3,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/app-shell";
 import { getCredits } from "@/lib/credits.functions";
-import { MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, Settings } from "lucide-react";
+import { MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, Settings, Crown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -19,6 +20,7 @@ const cards = [
   { to: "/generate", icon: ImageIcon, title: "Image Generator", desc: "Create study visuals from text", gradient: "from-orange-500 to-pink-500" },
   { to: "/history", icon: History, title: "History", desc: "Revisit past sessions", gradient: "from-slate-500 to-slate-700" },
   { to: "/profile", icon: User, title: "Profile", desc: "Account and preferences", gradient: "from-indigo-500 to-purple-500" },
+  { to: "/settings", icon: Settings, title: "Settings", desc: "Theme, language, and more", gradient: "from-pink-500 to-rose-500" },
 ] as const;
 
 function useCountdown(iso?: string) {
@@ -41,9 +43,17 @@ function Dashboard() {
   return (
     <AppShell>
       <div className="mx-auto max-w-6xl p-4 md:p-8 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Hi {name} 👋</h1>
-          <p className="text-muted-foreground mt-1">What are we tackling today?</p>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-bold">Hi {name} 👋</h1>
+            <p className="text-muted-foreground mt-1">What are we tackling today?</p>
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-accent/40 px-2.5 py-1 text-xs">
+              <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" /> Free Plan
+            </div>
+          </div>
+          <Link to="/upgrade">
+            <Button className="gradient-bg text-white border-0"><Crown className="h-4 w-4 mr-2" /> Upgrade Plan</Button>
+          </Link>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
