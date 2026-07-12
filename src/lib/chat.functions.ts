@@ -45,6 +45,24 @@ export const deleteThread = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const deleteMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v: unknown) => z.object({ id: z.string().uuid() }).parse(v))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("chat_messages").delete().eq("id", data.id).eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const renameThread = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v: unknown) => z.object({ id: z.string().uuid(), title: z.string().min(1).max(200) }).parse(v))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("chat_threads").update({ title: data.title }).eq("id", data.id).eq("user_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 const SendSchema = z.object({
   threadId: z.string().uuid(),
   content: z.string().min(1).max(8000),
