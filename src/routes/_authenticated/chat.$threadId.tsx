@@ -26,12 +26,13 @@ export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   head: () => ({ meta: [{ title: "Chat — AI Study Chat" }] }),
 });
 
-type SpeechRecognitionCtor = new () => {
+type SpeechRecognizer = {
   lang: string; continuous: boolean; interimResults: boolean;
   onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void;
   onerror: (e: unknown) => void; onend: () => void;
   start: () => void; stop: () => void;
 };
+type SpeechRecognitionCtor = new () => SpeechRecognizer;
 
 function ChatThread() {
   const { threadId } = Route.useParams();
