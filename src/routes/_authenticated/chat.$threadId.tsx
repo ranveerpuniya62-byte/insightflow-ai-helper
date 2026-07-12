@@ -67,7 +67,7 @@ function ChatThread() {
   const galleryRef = useRef<HTMLInputElement>(null);
   const docRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recogRef = useRef<ReturnType<SpeechRecognitionCtor> | null>(null);
+  const recogRef = useRef<SpeechRecognizer | null>(null);
 
   const messages = data?.messages ?? [];
 
