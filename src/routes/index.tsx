@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, BookOpen, Image as ImageIcon, ScanLine, Sparkles, ArrowRight } from "lucide-react";
+import { MessageSquare, BookOpen, Image as ImageIcon, ScanLine, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Landing });
 
