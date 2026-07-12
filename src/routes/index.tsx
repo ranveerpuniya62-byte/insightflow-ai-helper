@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, BookOpen, Image as ImageIcon, ScanLine, Sparkles, ArrowRight } from "lucide-react";
+import { MessageSquare, BookOpen, Image as ImageIcon, ScanLine, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Landing });
 
@@ -21,10 +21,7 @@ function Landing() {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 -z-10 opacity-40" style={{ background: "var(--gradient-hero)", filter: "blur(120px)" }} />
           <div className="mx-auto max-w-5xl px-4 pt-20 pb-24 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full glass px-3 py-1 text-xs">
-              <Sparkles className="h-3.5 w-3.5" /> Powered by Lovable AI
-            </div>
-            <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
               Your AI-powered <span className="gradient-text">study companion</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
