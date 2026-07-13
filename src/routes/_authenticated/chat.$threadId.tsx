@@ -377,9 +377,10 @@ function ChatThread() {
               </Button>
               <Textarea
                 ref={textareaRef}
+                autoFocus
                 value={input} onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-                placeholder="Message AI Study Chat…" rows={1}
+                placeholder="Ask me anything..." rows={1}
                 className="flex-1 border-0 bg-transparent resize-none focus-visible:ring-0 min-h-[40px] max-h-52 py-2"
               />
               <Button type="button" variant="ghost" size="icon" onClick={toggleMic} className={`shrink-0 rounded-full ${listening ? "text-red-500" : ""}`} aria-label="Voice">
