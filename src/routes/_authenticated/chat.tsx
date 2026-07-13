@@ -1,82 +1,54 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { AppShell } from "@/components/app-shell";
-import { listThreads, createThread, deleteThread } from "@/lib/chat.functions";
-import { Button } from "@/components/ui/button";
-import { Plus, Trash2, MessageSquare } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { listThreads, createThread } from "@/lib/chat.functions";
+import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/chat")({
-  component: ChatIndex,
+  component: ChatEntry,
   head: () => ({ meta: [{ title: "AI Chat — AI Study Chat" }] }),
 });
 
-function ChatIndex() {
+function ChatEntry() {
   const listFn = useServerFn(listThreads);
   const createFn = useServerFn(createThread);
-  const delFn = useServerFn(deleteThread);
   const qc = useQueryClient();
   const nav = useNavigate();
-  const [creating, setCreating] = useState(false);
-  const { data: threads = [] } = useQuery({ queryKey: ["threads"], queryFn: () => listFn() });
+  const started = useRef(false);
 
-  async function startNewChat() {
-    if (creating) return;
-    setCreating(true);
-    try {
-      const t = await createFn({ data: { title: "New chat" } });
-      await nav({ to: "/chat/$threadId", params: { threadId: t.id } });
-      qc.invalidateQueries({ queryKey: ["threads"] });
-    } catch (e) {
-      toast.error((e as Error).message);
-      setCreating(false);
-    }
-  }
-
-  async function onDelete(id: string) {
-    try {
-      await delFn({ data: { id } });
-      qc.invalidateQueries({ queryKey: ["threads"] });
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
-  }
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    (async () => {
+      try {
+        const threads = await qc.fetchQuery({
+          queryKey: ["threads"],
+          queryFn: () => listFn(),
+        });
+        if (threads && threads.length > 0) {
+          nav({ to: "/chat/$threadId", params: { threadId: threads[0].id }, replace: true });
+          return;
+        }
+        const t = await createFn({ data: { title: "New chat" } });
+        qc.invalidateQueries({ queryKey: ["threads"] });
+        nav({ to: "/chat/$threadId", params: { threadId: t.id }, replace: true });
+      } catch (e) {
+        toast.error((e as Error).message);
+        started.current = false;
+      }
+    })();
+  }, [listFn, createFn, qc, nav]);
 
   return (
-    <AppShell>
-      <div className="mx-auto max-w-3xl p-4 md:p-8 space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Your chats</h1>
-          <Button onClick={startNewChat} disabled={creating} className="gradient-bg text-white border-0">
-            <Plus className="mr-2 h-4 w-4" /> {creating ? "Opening…" : "New chat"}
-          </Button>
+    <div className="min-h-screen grid place-items-center">
+      <div className="flex items-center gap-3 text-muted-foreground">
+        <div className="grid h-9 w-9 place-items-center rounded-lg gradient-bg shadow-glow animate-pulse">
+          <Sparkles className="h-4 w-4 text-white" />
         </div>
-        {threads.length === 0 ? (
-          <div className="glass rounded-2xl p-10 text-center space-y-4">
-            <MessageSquare className="mx-auto h-10 w-10 text-muted-foreground" />
-            <p className="text-muted-foreground">No chats yet. Start your first conversation.</p>
-            <Button onClick={startNewChat} disabled={creating} className="gradient-bg text-white border-0">
-              <Plus className="mr-2 h-4 w-4" /> Start New Chat
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {threads.map((t) => (
-              <div key={t.id} className="glass rounded-xl p-4 flex items-center justify-between gap-2">
-                <Link to="/chat/$threadId" params={{ threadId: t.id }} className="flex-1 min-w-0 block">
-                  <div className="font-medium truncate">{t.title}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(t.updated_at).toLocaleString()}</div>
-                </Link>
-                <Button variant="ghost" size="icon" onClick={() => onDelete(t.id)} aria-label="Delete chat">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
+        <span className="text-sm">Opening chat…</span>
       </div>
-    </AppShell>
+    </div>
   );
 }
