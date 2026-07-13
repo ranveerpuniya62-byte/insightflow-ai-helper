@@ -40,6 +40,20 @@ export const Route = createFileRoute("/api/chat")({
         const threadId = String(body.threadId ?? "");
         if (!content || !threadId) return new Response("Bad request", { status: 400 });
 
+        const { data: existingThread, error: threadReadError } = await supabase
+          .from("chat_threads")
+          .select("id")
+          .eq("id", threadId)
+          .eq("user_id", userId)
+          .maybeSingle();
+        if (threadReadError) return new Response(threadReadError.message, { status: 500 });
+        if (!existingThread) {
+          const { error: createThreadError } = await supabase
+            .from("chat_threads")
+            .insert({ id: threadId, user_id: userId, title: "New chat" });
+          if (createThreadError) return new Response(createThreadError.message, { status: 500 });
+        }
+
         const { error: cErr } = await supabase.rpc("consume_credit", { _uid: userId, _kind: "chat" });
         if (cErr) {
           const msg = cErr.message.includes("no_credits")
@@ -48,9 +62,10 @@ export const Route = createFileRoute("/api/chat")({
           return new Response(msg, { status: 402 });
         }
 
-        await supabase.from("chat_messages").insert({
+        const { error: userMessageError } = await supabase.from("chat_messages").insert({
           thread_id: threadId, user_id: userId, role: "user", content,
         });
+        if (userMessageError) return new Response(userMessageError.message, { status: 500 });
 
         const { data: history } = await supabase.from("chat_messages")
           .select("role,content").eq("thread_id", threadId).eq("user_id", userId)
