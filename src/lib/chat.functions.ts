@@ -16,11 +16,28 @@ export const getThread = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
-    const [thread, messages] = await Promise.all([
-      context.supabase.from("chat_threads").select("id,title").eq("id", data.id).eq("user_id", context.userId).single(),
-      context.supabase.from("chat_messages").select("id,role,content,created_at").eq("thread_id", data.id).eq("user_id", context.userId).order("created_at"),
-    ]);
+    let thread = await context.supabase
+      .from("chat_threads")
+      .select("id,title")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
     if (thread.error) throw new Error(thread.error.message);
+    if (!thread.data) {
+      thread = await context.supabase
+        .from("chat_threads")
+        .insert({ id: data.id, user_id: context.userId, title: "New chat" })
+        .select("id,title")
+        .single();
+      if (thread.error) throw new Error(thread.error.message);
+    }
+
+    const messages = await context.supabase
+      .from("chat_messages")
+      .select("id,role,content,created_at")
+      .eq("thread_id", data.id)
+      .eq("user_id", context.userId)
+      .order("created_at");
     if (messages.error) throw new Error(messages.error.message);
     return { thread: thread.data, messages: messages.data ?? [] };
   });
