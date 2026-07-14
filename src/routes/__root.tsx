@@ -15,6 +15,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeProvider } from "@/lib/theme";
 import { UpgradeProvider } from "@/components/upgrade-dialog";
+import { registerServiceWorker } from "@/lib/register-sw";
 
 const themeInitScript = `(function(){try{var t=localStorage.getItem('asc-theme')||'system';var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);}catch(e){document.documentElement.classList.add('dark');}})();`;
 
@@ -62,10 +63,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "AI Study Chat — Your AI-powered study companion" },
       { name: "description", content: "Chat with AI, get step-by-step homework help, analyze images, and generate study visuals. Fast, free, and built for learners." },
       { name: "author", content: "AI Study Chat" },
+      { name: "theme-color", content: "#7c3aed" },
+      { name: "application-name", content: "AI Study Chat" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "AI Study" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { property: "og:title", content: "AI Study Chat — Your AI-powered study companion" },
       { property: "og:description", content: "Chat with AI, get step-by-step homework help, analyze images, and generate study visuals. Fast, free, and built for learners." },
       { property: "og:type", content: "website" },
@@ -78,6 +85,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { rel: "icon", href: "/icon-512.png", type: "image/png", sizes: "512x512" },
+      { rel: "apple-touch-icon", href: "/icon-192.png", sizes: "192x192" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
   shellComponent: RootShell,
@@ -109,6 +120,7 @@ function RootComponent() {
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
+  useEffect(() => { registerServiceWorker(); }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
