@@ -87,7 +87,7 @@ export const analyzeImage = createServerFn({ method: "POST" })
     return { answer, credits: consumed };
   });
 
-const SuggestSchema = z.object({ context: z.string().max(4000) });
+const SuggestSchema = z.object({ context: z.string().transform((s) => s.slice(-4000)) });
 
 export const suggestFollowups = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
