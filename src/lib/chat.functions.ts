@@ -108,7 +108,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       .order("created_at").limit(30);
 
     const messages: any[] = [
-      { role: "system", content: "You are AI Study Chat, a friendly, expert study companion. Use clean markdown. Use LaTeX ($...$ or $$...$$) for math. Give concise, exam-focused explanations. Include step-by-step when helpful." },
+      { role: "system", content: "You are AI Study Chat, a fast, friendly study companion. Answer ONLY what was asked — no filler. Be concise; give step-by-step detail only when explicitly requested. Use clean markdown and LaTeX ($...$ or $$...$$) for math." },
       ...(history ?? []).slice(0, -1).map((m) => ({ role: m.role, content: m.content })),
     ];
 
@@ -119,19 +119,26 @@ export const sendChatMessage = createServerFn({ method: "POST" })
 
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-      body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages }),
-    });
-    if (!res.ok) {
-      const t = await res.text();
+    const CHAT_MODELS = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+    let answer = "";
+    let lastErr = "";
+    for (const model of CHAT_MODELS) {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+        body: JSON.stringify({ model, messages }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        answer = json.choices?.[0]?.message?.content ?? "";
+        break;
+      }
+      lastErr = await res.text();
       if (res.status === 429) throw new Error("Rate limit. Please try again shortly.");
       if (res.status === 402) throw new Error("AI credits exhausted.");
-      throw new Error(`AI error ${res.status}: ${t.slice(0, 200)}`);
+      if (res.status === 401 || res.status === 400) break;
     }
-    const json = await res.json();
-    const answer: string = json.choices?.[0]?.message?.content ?? "";
+    if (!answer) throw new Error(`AI error: ${lastErr.slice(0, 200)}`);
 
     await context.supabase.from("chat_messages").insert({
       thread_id: data.threadId, user_id: context.userId, role: "assistant", content: answer,
