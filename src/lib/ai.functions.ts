@@ -98,7 +98,6 @@ export const suggestFollowups = createServerFn({ method: "POST" })
   .inputValidator((v: unknown) => SuggestSchema.parse(v))
   .handler(async ({ data }) => {
     const answer = await callAI({
-      model: "google/gemini-3-flash-preview",
       messages: [
         { role: "system", content: "Return exactly 4 short study follow-up questions related to the context. One per line. No numbering. Max 12 words each." },
         { role: "user", content: data.context.slice(-2000) },
