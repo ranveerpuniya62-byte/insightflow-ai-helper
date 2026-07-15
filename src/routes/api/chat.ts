@@ -72,7 +72,7 @@ export const Route = createFileRoute("/api/chat")({
           .order("created_at").limit(30);
 
         const messages: unknown[] = [
-          { role: "system", content: "You are AI Study Chat, a friendly, expert study companion. Use clean markdown. Use LaTeX ($...$ or $$...$$) for math. Give concise, exam-focused explanations. Include step-by-step when helpful." },
+          { role: "system", content: "You are AI Study Chat, a fast, friendly study companion. Answer ONLY what the user asked — no filler, no unrelated info. Be concise by default; give step-by-step detail only when explicitly asked. Use clean markdown and LaTeX ($...$ or $$...$$) for math." },
           ...(history ?? []).slice(0, -1).map((m) => ({ role: m.role, content: m.content })),
         ];
         messages.push(
@@ -81,15 +81,23 @@ export const Route = createFileRoute("/api/chat")({
             : { role: "user", content }
         );
 
-        const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey}` },
-          body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages, stream: true }),
-        });
-        if (!upstream.ok || !upstream.body) {
-          const t = await upstream.text();
-          return new Response(t || "Upstream error", { status: upstream.status });
+        const MODELS = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+        let upstream: Response | null = null;
+        let lastErr = "";
+        for (const model of MODELS) {
+          const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey}` },
+            body: JSON.stringify({ model, messages, stream: true }),
+          });
+          if (r.ok && r.body) { upstream = r; break; }
+          lastErr = await r.text();
+          if (r.status === 402 || r.status === 401 || r.status === 400) {
+            return new Response(lastErr || "Upstream error", { status: r.status });
+          }
         }
+        if (!upstream) return new Response(lastErr || "Upstream error", { status: 502 });
+
 
         const stream = new ReadableStream<Uint8Array>({
           async start(controller) {

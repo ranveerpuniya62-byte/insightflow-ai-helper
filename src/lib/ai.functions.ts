@@ -4,22 +4,28 @@ import { z } from "zod";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
-async function callAI(body: unknown): Promise<string> {
+const MODELS = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+
+async function callAI(body: Record<string, unknown>): Promise<string> {
   const key = process.env.LOVABLE_API_KEY;
   if (!key) throw new Error("Missing LOVABLE_API_KEY");
-  const res = await fetch(AI_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const text = await res.text();
+  let lastErr = "";
+  for (const model of MODELS) {
+    const res = await fetch(AI_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ ...body, model }),
+    });
+    if (res.ok) {
+      const json = await res.json();
+      return (json.choices?.[0]?.message?.content as string) ?? "";
+    }
+    lastErr = await res.text();
     if (res.status === 429) throw new Error("Rate limit. Please try again in a moment.");
     if (res.status === 402) throw new Error("AI credits exhausted. Please add credits.");
-    throw new Error(`AI error ${res.status}: ${text.slice(0, 200)}`);
+    if (res.status === 401 || res.status === 400) break;
   }
-  const json = await res.json();
-  return (json.choices?.[0]?.message?.content as string) ?? "";
+  throw new Error(`AI error: ${lastErr.slice(0, 200)}`);
 }
 
 const HomeworkSchema = z.object({
@@ -42,9 +48,8 @@ export const answerHomework = createServerFn({ method: "POST" })
     if (data.imageDataUrl) userContent.push({ type: "image_url", image_url: { url: data.imageDataUrl } });
 
     const answer = await callAI({
-      model: "google/gemini-3-flash-preview",
       messages: [
-        { role: "system", content: "You are an exam-focused study tutor. Give clear step-by-step solutions. Use headings, numbered steps, and end with a short 'Answer' section. Use LaTeX (single $ or $$) for math. Be concise." },
+        { role: "system", content: "You are an exam-focused study tutor. Answer ONLY the question asked. Be concise. Give step-by-step working only when the user explicitly requests steps or the problem clearly needs them (math/proofs). End with a bold 'Answer:' line. Use LaTeX ($...$ or $$...$$) for math. Student-friendly language. No unrelated topics." },
         { role: "user", content: userContent },
       ],
     });
@@ -70,9 +75,8 @@ export const analyzeImage = createServerFn({ method: "POST" })
       throw new Error(cErr.message);
     }
     const answer = await callAI({
-      model: "google/gemini-3-flash-preview",
       messages: [
-        { role: "system", content: "You analyze images for learners. Describe what you see, extract any text (OCR), then explain step-by-step. Use clear formatting." },
+        { role: "system", content: "You analyze images for learners. Be concise. Describe what's shown, OCR any text, then answer directly. Add step-by-step only if asked or clearly needed." },
         { role: "user", content: [
           { type: "text", text: data.prompt || "Please analyze this image and explain everything relevant." },
           { type: "image_url", image_url: { url: data.imageDataUrl } },
@@ -94,7 +98,6 @@ export const suggestFollowups = createServerFn({ method: "POST" })
   .inputValidator((v: unknown) => SuggestSchema.parse(v))
   .handler(async ({ data }) => {
     const answer = await callAI({
-      model: "google/gemini-3-flash-preview",
       messages: [
         { role: "system", content: "Return exactly 4 short study follow-up questions related to the context. One per line. No numbering. Max 12 words each." },
         { role: "user", content: data.context.slice(-2000) },
