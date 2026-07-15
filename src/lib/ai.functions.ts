@@ -48,9 +48,8 @@ export const answerHomework = createServerFn({ method: "POST" })
     if (data.imageDataUrl) userContent.push({ type: "image_url", image_url: { url: data.imageDataUrl } });
 
     const answer = await callAI({
-      model: "google/gemini-3-flash-preview",
       messages: [
-        { role: "system", content: "You are an exam-focused study tutor. Give clear step-by-step solutions. Use headings, numbered steps, and end with a short 'Answer' section. Use LaTeX (single $ or $$) for math. Be concise." },
+        { role: "system", content: "You are an exam-focused study tutor. Answer ONLY the question asked. Be concise. Give step-by-step working only when the user explicitly requests steps or the problem clearly needs them (math/proofs). End with a bold 'Answer:' line. Use LaTeX ($...$ or $$...$$) for math. Student-friendly language. No unrelated topics." },
         { role: "user", content: userContent },
       ],
     });
