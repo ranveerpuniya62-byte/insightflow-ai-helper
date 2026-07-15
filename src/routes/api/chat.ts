@@ -98,15 +98,6 @@ export const Route = createFileRoute("/api/chat")({
         }
         if (!upstream) return new Response(lastErr || "Upstream error", { status: 502 });
 
-        const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey}` },
-          body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages, stream: true }),
-        });
-        if (!upstream.ok || !upstream.body) {
-          const t = await upstream.text();
-          return new Response(t || "Upstream error", { status: upstream.status });
-        }
 
         const stream = new ReadableStream<Uint8Array>({
           async start(controller) {
