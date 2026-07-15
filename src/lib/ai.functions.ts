@@ -75,9 +75,8 @@ export const analyzeImage = createServerFn({ method: "POST" })
       throw new Error(cErr.message);
     }
     const answer = await callAI({
-      model: "google/gemini-3-flash-preview",
       messages: [
-        { role: "system", content: "You analyze images for learners. Describe what you see, extract any text (OCR), then explain step-by-step. Use clear formatting." },
+        { role: "system", content: "You analyze images for learners. Be concise. Describe what's shown, OCR any text, then answer directly. Add step-by-step only if asked or clearly needed." },
         { role: "user", content: [
           { type: "text", text: data.prompt || "Please analyze this image and explain everything relevant." },
           { type: "image_url", image_url: { url: data.imageDataUrl } },
