@@ -2,7 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const Schema = z.object({ prompt: z.string().min(3).max(1000) });
+const Schema = z.object({
+  prompt: z.string().min(3).max(1000),
+  referenceImageDataUrl: z.string().optional(),
+});
 
 export const generateImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -16,13 +19,19 @@ export const generateImage = createServerFn({ method: "POST" })
 
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
+
+    const userContent: unknown[] = [{ type: "text", text: data.prompt }];
+    if (data.referenceImageDataUrl) {
+      userContent.push({ type: "image_url", image_url: { url: data.referenceImageDataUrl } });
+    }
+
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-image",
         modalities: ["image", "text"],
-        messages: [{ role: "user", content: data.prompt }],
+        messages: [{ role: "user", content: userContent }],
       }),
     });
     if (!res.ok) {
@@ -38,7 +47,7 @@ export const generateImage = createServerFn({ method: "POST" })
     await context.supabase.from("history_items").insert({
       user_id: context.userId, kind: "generation",
       title: data.prompt.slice(0, 80),
-      payload: { prompt: data.prompt, imageUrl: url },
+      payload: { prompt: data.prompt, imageUrl: url, hasReference: !!data.referenceImageDataUrl },
     });
 
     return { imageUrl: url };
