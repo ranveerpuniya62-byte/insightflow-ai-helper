@@ -99,7 +99,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the theme init script toggles the "dark" class
+    // on <html> before React hydrates, so this attribute will always differ.
+    // Without suppression React bails out of hydration and the page renders
+    // but no event handlers attach (nothing is clickable).
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
