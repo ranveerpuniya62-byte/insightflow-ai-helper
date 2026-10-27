@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { chatSystemPrompt } from "@/lib/ai-persona";
 import { z } from "zod";
 
 export const listThreads = createServerFn({ method: "GET" })
@@ -120,7 +121,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       .order("created_at").limit(30);
 
     const messages: any[] = [
-      { role: "system", content: "You are AI Study Chat, a fast, friendly study companion. Answer ONLY what was asked — no filler. Be concise; give step-by-step detail only when explicitly requested. Use clean markdown and LaTeX ($...$ or $$...$$) for math." },
+      { role: "system", content: chatSystemPrompt() },
       ...(history ?? []).slice(0, -1).map((m) => ({ role: m.role, content: m.content })),
     ];
 
