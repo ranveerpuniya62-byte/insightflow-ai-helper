@@ -24,12 +24,24 @@ export const getThread = createServerFn({ method: "GET" })
       .maybeSingle();
     if (thread.error) throw new Error(thread.error.message);
     if (!thread.data) {
+      // Race-safe create: parallel calls (route preload + actual navigation) can
+      // both reach here for the same id; ignoreDuplicates avoids the
+      // chat_threads_pkey duplicate-key error, then re-select the winner's row.
+      const created = await context.supabase
+        .from("chat_threads")
+        .upsert(
+          { id: data.id, user_id: context.userId, title: "New chat" },
+          { ignoreDuplicates: true },
+        );
+      if (created.error) throw new Error(created.error.message);
       thread = await context.supabase
         .from("chat_threads")
-        .insert({ id: data.id, user_id: context.userId, title: "New chat" })
         .select("id,title")
-        .single();
+        .eq("id", data.id)
+        .eq("user_id", context.userId)
+        .maybeSingle();
       if (thread.error) throw new Error(thread.error.message);
+      if (!thread.data) throw new Error("Thread not found");
     }
 
     const messages = await context.supabase
