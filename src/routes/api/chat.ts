@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { chatSystemPrompt } from "@/lib/ai-persona";
 
 type Body = {
   threadId: string;
@@ -72,7 +73,7 @@ export const Route = createFileRoute("/api/chat")({
           .order("created_at").limit(30);
 
         const messages: unknown[] = [
-          { role: "system", content: "You are AI Study Chat, a fast, friendly study companion. Answer ONLY what the user asked — no filler, no unrelated info. Be concise by default; give step-by-step detail only when explicitly asked. Use clean markdown and LaTeX ($...$ or $$...$$) for math." },
+          { role: "system", content: chatSystemPrompt() },
           ...(history ?? []).slice(0, -1).map((m) => ({ role: m.role, content: m.content })),
         ];
         messages.push(

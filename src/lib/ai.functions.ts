@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { homeworkSystemPrompt, analyzeSystemPrompt } from "@/lib/ai-persona";
 import { z } from "zod";
 
 const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
@@ -49,7 +50,7 @@ export const answerHomework = createServerFn({ method: "POST" })
 
     const answer = await callAI({
       messages: [
-        { role: "system", content: "You are an exam-focused study tutor. Answer ONLY the question asked. Be concise. Give step-by-step working only when the user explicitly requests steps or the problem clearly needs them (math/proofs). End with a bold 'Answer:' line. Use LaTeX ($...$ or $$...$$) for math. Student-friendly language. No unrelated topics." },
+        { role: "system", content: homeworkSystemPrompt(data.subject) },
         { role: "user", content: userContent },
       ],
     });
@@ -76,7 +77,7 @@ export const analyzeImage = createServerFn({ method: "POST" })
     }
     const answer = await callAI({
       messages: [
-        { role: "system", content: "You analyze images for learners. Be concise. Describe what's shown, OCR any text, then answer directly. Add step-by-step only if asked or clearly needed." },
+        { role: "system", content: analyzeSystemPrompt() },
         { role: "user", content: [
           { type: "text", text: data.prompt || "Please analyze this image and explain everything relevant." },
           { type: "image_url", image_url: { url: data.imageDataUrl } },
