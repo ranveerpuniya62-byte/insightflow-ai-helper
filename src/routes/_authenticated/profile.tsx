@@ -72,6 +72,7 @@ function Profile() {
             <div>
               <div className="text-xs uppercase tracking-wide text-muted-foreground">Plan</div>
               <div className="mt-1 font-semibold">Free Plan</div>
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {stats.map((s) => (
