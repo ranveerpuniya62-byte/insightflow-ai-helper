@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCredits } from "@/lib/credits.functions";
-import { Crown, LogOut, MessageSquare, BookOpen, Image as ImageIcon } from "lucide-react";
+import { LogOut, MessageSquare, BookOpen, Image as ImageIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: Profile,
@@ -70,10 +70,8 @@ function Profile() {
         <div className="glass rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">Subscription</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">Plan</div>
               <div className="mt-1 font-semibold">Free Plan</div>
-            </div>
-            <Link to="/upgrade"><Button size="sm" className="gradient-bg text-white border-0"><Crown className="h-4 w-4 mr-1.5" /> Upgrade</Button></Link>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {stats.map((s) => (
