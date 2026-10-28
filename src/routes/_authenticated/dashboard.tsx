@@ -3,10 +3,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/app-shell";
 import { getCredits } from "@/lib/credits.functions";
-import { MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, Settings, Crown } from "lucide-react";
+import { MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -51,9 +50,6 @@ function Dashboard() {
               <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" /> Free Plan
             </div>
           </div>
-          <Link to="/upgrade">
-            <Button className="gradient-bg text-white border-0"><Crown className="h-4 w-4 mr-2" /> Upgrade Plan</Button>
-          </Link>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">

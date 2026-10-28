@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { Home, MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, LogOut, Sparkles, Settings, Crown } from "lucide-react";
+import { Home, MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, LogOut, Sparkles, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -57,9 +57,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <Link to="/upgrade" className="mb-2 flex items-center gap-2 rounded-lg gradient-bg px-3 py-2 text-sm font-medium text-white shadow-glow">
-          <Crown className="h-4 w-4" /> Upgrade Plan
-        </Link>
         <Button variant="ghost" size="sm" className="justify-start" onClick={signOut}><LogOut className="h-4 w-4 mr-2" /> Sign out</Button>
       </aside>
 
