@@ -6,7 +6,6 @@ import { getCredits } from "@/lib/credits.functions";
 import { MessageSquare, BookOpen, ScanLine, Image as ImageIcon, History, User, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
