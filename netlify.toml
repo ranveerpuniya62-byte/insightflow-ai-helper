@@ -1,0 +1,21 @@
+# Netlify deployment for AI Study Chat (TanStack Start full-stack build)
+# The app runs server code (server functions, SSR, AI streaming), so Netlify
+# deploys it as a full-stack site — not a plain static SPA. Nitro adapts the
+# server output to Netlify and writes the required redirect rules into the
+# build, so no manual /index.html fallback is needed here.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # Nitro preset for Netlify; also auto-detected when NETLIFY is set.
+  NITRO_PRESET = "netlify"
+
+# Required environment variables (set in Netlify: Site settings → Environment variables):
+#   Build-time (browser):
+#     VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID
+#   Server-side:
+#     SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
+#     LOVABLE_API_KEY   (AI gateway key, used by chat/homework/image features)
