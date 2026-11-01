@@ -17,8 +17,10 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as StudyTipsRouteImport } from './routes/study-tips'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAnalyzeRouteImport } from './routes/_authenticated/analyze'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
@@ -29,6 +31,11 @@ import { Route as AuthenticatedHomeworkRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as StudyTipsAiForStudyingRouteImport } from './routes/study-tips_.ai-for-studying'
+import { Route as StudyTipsExamPreparationRouteImport } from './routes/study-tips_.exam-preparation'
+import { Route as StudyTipsMemoryTechniquesRouteImport } from './routes/study-tips_.memory-techniques'
+import { Route as StudyTipsNoteTakingRouteImport } from './routes/study-tips_.note-taking'
+import { Route as StudyTipsTimeManagementRouteImport } from './routes/study-tips_.time-management'
 import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -70,6 +77,11 @@ const HelpRoute = HelpRouteImport.update({
   path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -78,6 +90,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyTipsRoute = StudyTipsRouteImport.update({
+  id: '/study-tips',
+  path: '/study-tips',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -130,6 +147,33 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudyTipsAiForStudyingRoute = StudyTipsAiForStudyingRouteImport.update({
+  id: '/study-tips_/ai-for-studying',
+  path: '/study-tips/ai-for-studying',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyTipsExamPreparationRoute =
+  StudyTipsExamPreparationRouteImport.update({
+    id: '/study-tips_/exam-preparation',
+    path: '/study-tips/exam-preparation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const StudyTipsMemoryTechniquesRoute =
+  StudyTipsMemoryTechniquesRouteImport.update({
+    id: '/study-tips_/memory-techniques',
+    path: '/study-tips/memory-techniques',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const StudyTipsNoteTakingRoute = StudyTipsNoteTakingRouteImport.update({
+  id: '/study-tips_/note-taking',
+  path: '/study-tips/note-taking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyTipsTimeManagementRoute = StudyTipsTimeManagementRouteImport.update({
+  id: '/study-tips_/time-management',
+  path: '/study-tips/time-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedChatThreadIdRoute =
   AuthenticatedChatThreadIdRouteImport.update({
     id: '/$threadId',
@@ -145,8 +189,10 @@ export interface FileRoutesByFullPath {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/help': typeof HelpRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/study-tips': typeof StudyTipsRoute
   '/terms': typeof TermsRoute
   '/analyze': typeof AuthenticatedAnalyzeRoute
   '/chat': typeof AuthenticatedChatRouteWithChildren
@@ -157,6 +203,11 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/api/chat': typeof ApiChatRoute
+  '/study-tips/ai-for-studying': typeof StudyTipsAiForStudyingRoute
+  '/study-tips/exam-preparation': typeof StudyTipsExamPreparationRoute
+  '/study-tips/memory-techniques': typeof StudyTipsMemoryTechniquesRoute
+  '/study-tips/note-taking': typeof StudyTipsNoteTakingRoute
+  '/study-tips/time-management': typeof StudyTipsTimeManagementRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
 }
 export interface FileRoutesByTo {
@@ -167,8 +218,10 @@ export interface FileRoutesByTo {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/help': typeof HelpRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/study-tips': typeof StudyTipsRoute
   '/terms': typeof TermsRoute
   '/analyze': typeof AuthenticatedAnalyzeRoute
   '/chat': typeof AuthenticatedChatRouteWithChildren
@@ -179,6 +232,11 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/api/chat': typeof ApiChatRoute
+  '/study-tips/ai-for-studying': typeof StudyTipsAiForStudyingRoute
+  '/study-tips/exam-preparation': typeof StudyTipsExamPreparationRoute
+  '/study-tips/memory-techniques': typeof StudyTipsMemoryTechniquesRoute
+  '/study-tips/note-taking': typeof StudyTipsNoteTakingRoute
+  '/study-tips/time-management': typeof StudyTipsTimeManagementRoute
   '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
 }
 export interface FileRoutesById {
@@ -191,8 +249,10 @@ export interface FileRoutesById {
   '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/help': typeof HelpRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/study-tips': typeof StudyTipsRoute
   '/terms': typeof TermsRoute
   '/_authenticated/analyze': typeof AuthenticatedAnalyzeRoute
   '/_authenticated/chat': typeof AuthenticatedChatRouteWithChildren
@@ -203,6 +263,11 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/api/chat': typeof ApiChatRoute
+  '/study-tips_/ai-for-studying': typeof StudyTipsAiForStudyingRoute
+  '/study-tips_/exam-preparation': typeof StudyTipsExamPreparationRoute
+  '/study-tips_/memory-techniques': typeof StudyTipsMemoryTechniquesRoute
+  '/study-tips_/note-taking': typeof StudyTipsNoteTakingRoute
+  '/study-tips_/time-management': typeof StudyTipsTimeManagementRoute
   '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
 }
 export interface FileRouteTypes {
@@ -215,8 +280,10 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/help'
+    | '/how-it-works'
     | '/privacy'
     | '/reset-password'
+    | '/study-tips'
     | '/terms'
     | '/analyze'
     | '/chat'
@@ -227,6 +294,11 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/api/chat'
+    | '/study-tips/ai-for-studying'
+    | '/study-tips/exam-preparation'
+    | '/study-tips/memory-techniques'
+    | '/study-tips/note-taking'
+    | '/study-tips/time-management'
     | '/chat/$threadId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -237,8 +309,10 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/help'
+    | '/how-it-works'
     | '/privacy'
     | '/reset-password'
+    | '/study-tips'
     | '/terms'
     | '/analyze'
     | '/chat'
@@ -249,6 +323,11 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/api/chat'
+    | '/study-tips/ai-for-studying'
+    | '/study-tips/exam-preparation'
+    | '/study-tips/memory-techniques'
+    | '/study-tips/note-taking'
+    | '/study-tips/time-management'
     | '/chat/$threadId'
   id:
     | '__root__'
@@ -260,8 +339,10 @@ export interface FileRouteTypes {
     | '/cookies'
     | '/faq'
     | '/help'
+    | '/how-it-works'
     | '/privacy'
     | '/reset-password'
+    | '/study-tips'
     | '/terms'
     | '/_authenticated/analyze'
     | '/_authenticated/chat'
@@ -272,6 +353,11 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/settings'
     | '/api/chat'
+    | '/study-tips_/ai-for-studying'
+    | '/study-tips_/exam-preparation'
+    | '/study-tips_/memory-techniques'
+    | '/study-tips_/note-taking'
+    | '/study-tips_/time-management'
     | '/_authenticated/chat/$threadId'
   fileRoutesById: FileRoutesById
 }
@@ -284,10 +370,17 @@ export interface RootRouteChildren {
   CookiesRoute: typeof CookiesRoute
   FaqRoute: typeof FaqRoute
   HelpRoute: typeof HelpRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  StudyTipsRoute: typeof StudyTipsRoute
   TermsRoute: typeof TermsRoute
   ApiChatRoute: typeof ApiChatRoute
+  StudyTipsAiForStudyingRoute: typeof StudyTipsAiForStudyingRoute
+  StudyTipsExamPreparationRoute: typeof StudyTipsExamPreparationRoute
+  StudyTipsMemoryTechniquesRoute: typeof StudyTipsMemoryTechniquesRoute
+  StudyTipsNoteTakingRoute: typeof StudyTipsNoteTakingRoute
+  StudyTipsTimeManagementRoute: typeof StudyTipsTimeManagementRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -348,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -360,6 +460,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study-tips': {
+      id: '/study-tips'
+      path: '/study-tips'
+      fullPath: '/study-tips'
+      preLoaderRoute: typeof StudyTipsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -432,6 +539,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/study-tips_/ai-for-studying': {
+      id: '/study-tips_/ai-for-studying'
+      path: '/study-tips/ai-for-studying'
+      fullPath: '/study-tips/ai-for-studying'
+      preLoaderRoute: typeof StudyTipsAiForStudyingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study-tips_/exam-preparation': {
+      id: '/study-tips_/exam-preparation'
+      path: '/study-tips/exam-preparation'
+      fullPath: '/study-tips/exam-preparation'
+      preLoaderRoute: typeof StudyTipsExamPreparationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study-tips_/memory-techniques': {
+      id: '/study-tips_/memory-techniques'
+      path: '/study-tips/memory-techniques'
+      fullPath: '/study-tips/memory-techniques'
+      preLoaderRoute: typeof StudyTipsMemoryTechniquesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study-tips_/note-taking': {
+      id: '/study-tips_/note-taking'
+      path: '/study-tips/note-taking'
+      fullPath: '/study-tips/note-taking'
+      preLoaderRoute: typeof StudyTipsNoteTakingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study-tips_/time-management': {
+      id: '/study-tips_/time-management'
+      path: '/study-tips/time-management'
+      fullPath: '/study-tips/time-management'
+      preLoaderRoute: typeof StudyTipsTimeManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/chat/$threadId': {
       id: '/_authenticated/chat/$threadId'
       path: '/$threadId'
@@ -487,10 +629,17 @@ const rootRouteChildren: RootRouteChildren = {
   CookiesRoute: CookiesRoute,
   FaqRoute: FaqRoute,
   HelpRoute: HelpRoute,
+  HowItWorksRoute: HowItWorksRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  StudyTipsRoute: StudyTipsRoute,
   TermsRoute: TermsRoute,
   ApiChatRoute: ApiChatRoute,
+  StudyTipsAiForStudyingRoute: StudyTipsAiForStudyingRoute,
+  StudyTipsExamPreparationRoute: StudyTipsExamPreparationRoute,
+  StudyTipsMemoryTechniquesRoute: StudyTipsMemoryTechniquesRoute,
+  StudyTipsNoteTakingRoute: StudyTipsNoteTakingRoute,
+  StudyTipsTimeManagementRoute: StudyTipsTimeManagementRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
