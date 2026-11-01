@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /chat
+Disallow: /homework
+Disallow: /analyze
+Disallow: /generate
+Disallow: /history
+Disallow: /profile
+Disallow: /settings
+
+Sitemap: https://aistudychat.lovable.app/sitemap.xml
