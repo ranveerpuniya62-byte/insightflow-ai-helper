@@ -35,7 +35,6 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { suggestFollowups } from "@/lib/ai.functions";
 import { createThread, deleteMessage, getThread, listThreads, renameThread } from "@/lib/chat.functions";
 import { compressImage } from "@/lib/image";
 
@@ -109,7 +108,6 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
   const nav = useNavigate();
   const qc = useQueryClient();
   const getFn = useServerFn(getThread);
-  const suggestFn = useServerFn(suggestFollowups);
   const delMsgFn = useServerFn(deleteMessage);
   const createFn = useServerFn(createThread);
   const renameFn = useServerFn(renameThread);
@@ -120,7 +118,6 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
   const [input, setInput] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [attachName, setAttachName] = useState<string | null>(null);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
   const [optimisticUser, setOptimisticUser] = useState<string | null>(null);
   const [streaming, setStreaming] = useState("");
@@ -297,7 +294,6 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
     setInput("");
     setImage(null);
     setAttachName(null);
-    setSuggestions([]);
     setOptimisticUser(content || "(image)");
     setStreaming("");
     setPending(true);
@@ -339,8 +335,6 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
       qc.invalidateQueries({ queryKey: ["credits"] });
       qc.invalidateQueries({ queryKey: ["threads"] });
 
-      const ctx = messages.slice(-6).map((m) => `${m.role}: ${m.content}`).join("\n") + `\nuser: ${content}\nassistant: ${acc}`;
-      suggestFn({ data: { context: ctx } }).then((r) => setSuggestions(r.suggestions)).catch(() => {});
     } catch (e) {
       const err = e as Error;
       if (err.name !== "AbortError") toast.error(err.message);
@@ -460,7 +454,6 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
     setInput("");
     setImage(null);
     setAttachName(null);
-    setSuggestions([]);
     setOptimisticUser(null);
     setStreaming("");
     setPending(false);
@@ -580,16 +573,6 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
                       <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "240ms" }} />
                     </div>
                   )}
-                </div>
-              </div>
-            )}
-            {suggestions.length > 0 && !pending && (
-              <div className="glass rounded-2xl p-4">
-                <div className="text-xs font-semibold text-muted-foreground mb-2">You may also ask:</div>
-                <div className="flex flex-wrap gap-2">
-                  {suggestions.map((s) => (
-                    <button key={s} type="button" onClick={() => setInput(s)} className="text-xs rounded-full border border-border/50 px-3 py-1.5 hover:bg-accent">{s}</button>
-                  ))}
                 </div>
               </div>
             )}

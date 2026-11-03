@@ -92,17 +92,3 @@ export const analyzeImage = createServerFn({ method: "POST" })
     return { answer, credits: consumed };
   });
 
-const SuggestSchema = z.object({ context: z.string().transform((s) => s.slice(-4000)) });
-
-export const suggestFollowups = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((v: unknown) => SuggestSchema.parse(v))
-  .handler(async ({ data }) => {
-    const answer = await callAI({
-      messages: [
-        { role: "system", content: "Return exactly 4 short study follow-up questions related to the context. One per line. No numbering. Max 12 words each." },
-        { role: "user", content: data.context.slice(-2000) },
-      ],
-    });
-    return { suggestions: answer.split("\n").map((s) => s.replace(/^[-•\d.\s]+/, "").trim()).filter(Boolean).slice(0, 5) };
-  });
