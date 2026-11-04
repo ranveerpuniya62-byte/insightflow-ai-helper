@@ -11,9 +11,13 @@ export const generateImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => Schema.parse(v))
   .handler(async ({ data, context }) => {
-    const { error: cErr } = await context.supabase.rpc("consume_credit", { _uid: context.userId, _kind: "image" });
+    const { error: cErr } = await context.supabase.rpc("consume_credit", {
+      _uid: context.userId,
+      _kind: "image",
+    });
     if (cErr) {
-      if (cErr.message.includes("no_credits")) throw new Error("You've used all your daily image credits.");
+      if (cErr.message.includes("no_credits"))
+        throw new Error("You've used all your daily image credits.");
       throw new Error(cErr.message);
     }
 
@@ -45,7 +49,8 @@ export const generateImage = createServerFn({ method: "POST" })
     if (!url) throw new Error("No image returned");
 
     await context.supabase.from("history_items").insert({
-      user_id: context.userId, kind: "generation",
+      user_id: context.userId,
+      kind: "generation",
       title: data.prompt.slice(0, 80),
       payload: { prompt: data.prompt, imageUrl: url, hasReference: !!data.referenceImageDataUrl },
     });

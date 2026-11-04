@@ -32,7 +32,11 @@ async function unregisterMatching() {
     const regs = await navigator.serviceWorker.getRegistrations();
     await Promise.all(
       regs
-        .filter((r) => (r.active?.scriptURL || r.installing?.scriptURL || r.waiting?.scriptURL || "").endsWith(SW_URL))
+        .filter((r) =>
+          (r.active?.scriptURL || r.installing?.scriptURL || r.waiting?.scriptURL || "").endsWith(
+            SW_URL,
+          ),
+        )
         .map((r) => r.unregister()),
     );
   } catch {

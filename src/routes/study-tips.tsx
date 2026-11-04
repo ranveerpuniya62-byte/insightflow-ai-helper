@@ -58,9 +58,8 @@ function StudyTipsHub() {
             Study tips that <span className="gradient-text">actually work</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            Short, practical guides written for students — no fluff, no jargon. Each one takes
-            about five minutes to read and gives you something you can use in tonight's study
-            session.
+            Short, practical guides written for students — no fluff, no jargon. Each one takes about
+            five minutes to read and gives you something you can use in tonight's study session.
           </p>
         </section>
         <section className="mx-auto max-w-4xl px-4 pb-20 grid gap-4 sm:grid-cols-2">

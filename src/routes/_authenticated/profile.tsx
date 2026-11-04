@@ -29,7 +29,11 @@ function Profile() {
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return;
       setEmail(data.user.email || "");
-      const { data: p } = await supabase.from("profiles").select("full_name").eq("id", data.user.id).maybeSingle();
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", data.user.id)
+        .maybeSingle();
       setName(p?.full_name || "");
     });
   }, []);
@@ -38,14 +42,18 @@ function Profile() {
     setLoading(true);
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return;
-    const { error } = await supabase.from("profiles").update({ full_name: name, updated_at: new Date().toISOString() }).eq("id", u.user.id);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: name, updated_at: new Date().toISOString() })
+      .eq("id", u.user.id);
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("Profile updated");
   }
 
   async function signOut() {
-    await qc.cancelQueries(); qc.clear();
+    await qc.cancelQueries();
+    qc.clear();
     await supabase.auth.signOut();
     nav({ to: "/auth", replace: true });
   }
@@ -62,9 +70,17 @@ function Profile() {
         <h1 className="text-2xl font-bold">Profile</h1>
 
         <div className="glass rounded-2xl p-6 space-y-4">
-          <div><Label>Email</Label><Input value={email} disabled /></div>
-          <div><Label>Full name</Label><Input value={name} onChange={(e) => setName(e.target.value)} /></div>
-          <Button onClick={save} disabled={loading} className="gradient-bg text-white border-0">Save</Button>
+          <div>
+            <Label>Email</Label>
+            <Input value={email} disabled />
+          </div>
+          <div>
+            <Label>Full name</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+          <Button onClick={save} disabled={loading} className="gradient-bg text-white border-0">
+            Save
+          </Button>
         </div>
 
         <div className="glass rounded-2xl p-6 space-y-4">
@@ -78,16 +94,20 @@ function Profile() {
             {stats.map((s) => (
               <div key={s.label} className="rounded-xl border border-border/50 p-3 text-center">
                 <s.icon className="h-4 w-4 mx-auto text-muted-foreground" />
-                <div className="mt-1.5 text-lg font-bold">{s.value}<span className="text-xs text-muted-foreground font-normal">/{s.total}</span></div>
+                <div className="mt-1.5 text-lg font-bold">
+                  {s.value}
+                  <span className="text-xs text-muted-foreground font-normal">/{s.total}</span>
+                </div>
                 <div className="text-[10px] text-muted-foreground">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
 
-        <Button variant="outline" onClick={signOut} className="w-full"><LogOut className="h-4 w-4 mr-2" /> Logout</Button>
+        <Button variant="outline" onClick={signOut} className="w-full">
+          <LogOut className="h-4 w-4 mr-2" /> Logout
+        </Button>
       </div>
     </AppShell>
   );
 }
-

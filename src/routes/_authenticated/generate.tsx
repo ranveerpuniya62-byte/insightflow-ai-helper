@@ -32,7 +32,10 @@ function Generate() {
   const qc = useQueryClient();
   const m = useMutation({
     mutationFn: () => fn({ data: { prompt, referenceImageDataUrl: reference ?? undefined } }),
-    onSuccess: (r) => { setUrl(r.imageUrl); qc.invalidateQueries({ queryKey: ["credits"] }); },
+    onSuccess: (r) => {
+      setUrl(r.imageUrl);
+      qc.invalidateQueries({ queryKey: ["credits"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -52,12 +55,24 @@ function Generate() {
     <AppShell>
       <div className="mx-auto max-w-3xl p-4 md:p-8 space-y-4">
         <div className="flex items-center gap-2">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-orange-500 to-pink-500"><ImageIcon className="h-5 w-5 text-white" /></div>
-          <div><h1 className="text-2xl font-bold">Image Generator</h1><p className="text-sm text-muted-foreground">Turn ideas into study visuals. Attach a reference for image-to-image.</p></div>
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-orange-500 to-pink-500">
+            <ImageIcon className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Image Generator</h1>
+            <p className="text-sm text-muted-foreground">
+              Turn ideas into study visuals. Attach a reference for image-to-image.
+            </p>
+          </div>
         </div>
 
         <div className="glass rounded-2xl p-4 space-y-3">
-          <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder="Describe the image you want…" rows={4} />
+          <Textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Describe the image you want…"
+            rows={4}
+          />
 
           {reference && (
             <div className="relative w-fit">
@@ -76,7 +91,12 @@ function Generate() {
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="button" variant="outline" size="icon" aria-label="Attach reference image">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Attach reference image"
+                >
                   <Plus className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -95,18 +115,33 @@ function Generate() {
               disabled={m.isPending || prompt.trim().length < 3}
               onClick={() => m.mutate()}
             >
-              {m.isPending ? "Generating…" : reference ? "Generate from reference" : "Generate image"}
+              {m.isPending
+                ? "Generating…"
+                : reference
+                  ? "Generate from reference"
+                  : "Generate image"}
             </Button>
           </div>
 
-          <input ref={cameraRef} type="file" accept="image/*" capture="environment" hidden onChange={pickImage} />
+          <input
+            ref={cameraRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden
+            onChange={pickImage}
+          />
           <input ref={galleryRef} type="file" accept="image/*" hidden onChange={pickImage} />
         </div>
 
         {url && (
           <div className="glass rounded-2xl p-4 space-y-3">
             <img src={url} alt="generated" className="w-full rounded-lg" />
-            <a href={url} download="ai-study-chat.png"><Button variant="outline" className="w-full"><Download className="h-4 w-4 mr-2" /> Download</Button></a>
+            <a href={url} download="ai-study-chat.png">
+              <Button variant="outline" className="w-full">
+                <Download className="h-4 w-4 mr-2" /> Download
+              </Button>
+            </a>
           </div>
         )}
       </div>

@@ -2,7 +2,6 @@
 @source "../src";
 @import "tw-animate-css";
 
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -83,7 +82,12 @@
   --sidebar-border: oklch(0.9 0.015 260);
   --sidebar-ring: oklch(0.62 0.22 285);
 
-  --gradient-hero: linear-gradient(135deg, oklch(0.62 0.22 285), oklch(0.72 0.2 320) 55%, oklch(0.78 0.18 30));
+  --gradient-hero: linear-gradient(
+    135deg,
+    oklch(0.62 0.22 285),
+    oklch(0.72 0.2 320) 55%,
+    oklch(0.78 0.18 30)
+  );
   --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
   --gradient-card: linear-gradient(160deg, oklch(1 0 0 / 0.7), oklch(0.96 0.02 260 / 0.5));
   --shadow-elegant: 0 20px 60px -20px color-mix(in oklab, var(--primary) 35%, transparent);
@@ -125,7 +129,12 @@
   --sidebar-border: oklch(1 0 0 / 0.1);
   --sidebar-ring: oklch(0.72 0.2 285);
 
-  --gradient-hero: linear-gradient(135deg, oklch(0.55 0.24 285), oklch(0.6 0.22 320) 50%, oklch(0.62 0.22 20));
+  --gradient-hero: linear-gradient(
+    135deg,
+    oklch(0.55 0.24 285),
+    oklch(0.6 0.22 320) 50%,
+    oklch(0.62 0.22 20)
+  );
   --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
   --gradient-card: linear-gradient(160deg, oklch(0.24 0.04 265 / 0.6), oklch(0.18 0.03 265 / 0.4));
   --shadow-elegant: 0 20px 60px -20px color-mix(in oklab, var(--primary) 55%, transparent);
@@ -133,8 +142,12 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { color-scheme: dark; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    color-scheme: dark;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -160,23 +173,58 @@
   background: var(--gradient-hero);
 }
 
-.prose-chat p { margin: 0.5rem 0; }
+.prose-chat p {
+  margin: 0.5rem 0;
+}
 .prose-chat pre {
   background: color-mix(in oklab, var(--foreground) 8%, transparent);
-  padding: 0.75rem 1rem; border-radius: 0.75rem; overflow-x: auto;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
   font-size: 0.85rem;
 }
-.prose-chat code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+.prose-chat code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
 .prose-chat :not(pre) > code {
   background: color-mix(in oklab, var(--foreground) 8%, transparent);
-  padding: 0.1rem 0.35rem; border-radius: 0.35rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
 }
-.prose-chat ul { list-style: disc; padding-left: 1.25rem; }
-.prose-chat ol { list-style: decimal; padding-left: 1.25rem; }
-.prose-chat h1, .prose-chat h2, .prose-chat h3 { font-weight: 600; margin: 0.75rem 0 0.35rem; }
-.prose-chat h1 { font-size: 1.25rem; }
-.prose-chat h2 { font-size: 1.1rem; }
-.prose-chat h3 { font-size: 1rem; }
-.prose-chat a { color: var(--primary); text-decoration: underline; }
-.prose-chat table { border-collapse: collapse; margin: 0.5rem 0; }
-.prose-chat th, .prose-chat td { border: 1px solid var(--border); padding: 0.35rem 0.6rem; }
+.prose-chat ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.prose-chat ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.prose-chat h1,
+.prose-chat h2,
+.prose-chat h3 {
+  font-weight: 600;
+  margin: 0.75rem 0 0.35rem;
+}
+.prose-chat h1 {
+  font-size: 1.25rem;
+}
+.prose-chat h2 {
+  font-size: 1.1rem;
+}
+.prose-chat h3 {
+  font-size: 1rem;
+}
+.prose-chat a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+.prose-chat table {
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+.prose-chat th,
+.prose-chat td {
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.6rem;
+}

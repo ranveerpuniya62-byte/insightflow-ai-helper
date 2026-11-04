@@ -38,11 +38,43 @@ function Contact() {
   return (
     <LegalPage title="Contact us">
       <form onSubmit={submit} className="space-y-3 not-prose">
-        <div><Label>Name</Label><Input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} maxLength={100} /></div>
-        <div><Label>Email</Label><Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} maxLength={255} /></div>
-        <div><Label>Subject</Label><Input value={f.subject} onChange={(e) => setF({ ...f, subject: e.target.value })} maxLength={200} /></div>
-        <div><Label>Message</Label><Textarea rows={5} value={f.message} onChange={(e) => setF({ ...f, message: e.target.value })} maxLength={2000} /></div>
-        <Button type="submit" disabled={loading} className="gradient-bg text-white border-0">Send message</Button>
+        <div>
+          <Label>Name</Label>
+          <Input
+            value={f.name}
+            onChange={(e) => setF({ ...f, name: e.target.value })}
+            maxLength={100}
+          />
+        </div>
+        <div>
+          <Label>Email</Label>
+          <Input
+            type="email"
+            value={f.email}
+            onChange={(e) => setF({ ...f, email: e.target.value })}
+            maxLength={255}
+          />
+        </div>
+        <div>
+          <Label>Subject</Label>
+          <Input
+            value={f.subject}
+            onChange={(e) => setF({ ...f, subject: e.target.value })}
+            maxLength={200}
+          />
+        </div>
+        <div>
+          <Label>Message</Label>
+          <Textarea
+            rows={5}
+            value={f.message}
+            onChange={(e) => setF({ ...f, message: e.target.value })}
+            maxLength={2000}
+          />
+        </div>
+        <Button type="submit" disabled={loading} className="gradient-bg text-white border-0">
+          Send message
+        </Button>
       </form>
     </LegalPage>
   );
