@@ -35,7 +35,13 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
-import { createThread, deleteMessage, getThread, listThreads, renameThread } from "@/lib/chat.functions";
+import {
+  createThread,
+  deleteMessage,
+  getThread,
+  listThreads,
+  renameThread,
+} from "@/lib/chat.functions";
 import { compressImage } from "@/lib/image";
 
 const ACTIVE_THREAD_KEY = "asc-active-chat-thread-id";
@@ -113,8 +119,12 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
   const renameFn = useServerFn(renameThread);
   const listFn = useServerFn(listThreads);
 
-  const [activeThreadId, setActiveThreadId] = useState<string | null>(() => initialThreadId ?? readActiveThreadId());
-  const [cachedThread, setCachedThread] = useState<ChatThreadData | null>(() => readCachedThread(initialThreadId ?? readActiveThreadId()));
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(
+    () => initialThreadId ?? readActiveThreadId(),
+  );
+  const [cachedThread, setCachedThread] = useState<ChatThreadData | null>(() =>
+    readCachedThread(initialThreadId ?? readActiveThreadId()),
+  );
   const [input, setInput] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [attachName, setAttachName] = useState<string | null>(null);
@@ -175,12 +185,14 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
       qc.invalidateQueries({ queryKey: ["threads"] });
       nav({ to: "/chat/$threadId", params: { threadId: nextId }, replace });
       return nextId;
-    })().catch((error: Error) => {
-      toast.error(error.message);
-      return null;
-    }).finally(() => {
-      createPromiseRef.current = null;
-    });
+    })()
+      .catch((error: Error) => {
+        toast.error(error.message);
+        return null;
+      })
+      .finally(() => {
+        createPromiseRef.current = null;
+      });
     return createPromiseRef.current;
   }
 
@@ -217,11 +229,11 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
           return;
         }
 
-        const existing = await qc.fetchQuery({
+        const existing = (await qc.fetchQuery({
           queryKey: ["threads"],
           queryFn: () => listFn(),
           staleTime: 30_000,
-        }) as ChatThreadSummary[];
+        })) as ChatThreadSummary[];
         if (cancelled) return;
 
         if (existing.length > 0) {
@@ -255,7 +267,8 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
   }, [activeThreadId, threadQuery.data]);
 
   useEffect(() => {
-    if (!activeThreadId || !threadQuery.isError || recoveredForRef.current === activeThreadId) return;
+    if (!activeThreadId || !threadQuery.isError || recoveredForRef.current === activeThreadId)
+      return;
     recoveredForRef.current = activeThreadId;
     void createFreshThread(true);
   }, [activeThreadId, threadQuery.isError]);
@@ -302,7 +315,7 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
     abortRef.current = controller;
 
     try {
-      const sendThreadId = activeThreadId ?? await createFreshThread(true);
+      const sendThreadId = activeThreadId ?? (await createFreshThread(true));
       if (!sendThreadId) throw new Error("Couldn't open a chat. Please try again.");
 
       const { data: sess } = await supabase.auth.getSession();
@@ -312,7 +325,11 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ threadId: sendThreadId, content: content || "Please analyze this.", imageDataUrl: img || undefined }),
+        body: JSON.stringify({
+          threadId: sendThreadId,
+          content: content || "Please analyze this.",
+          imageDataUrl: img || undefined,
+        }),
         signal: controller.signal,
       });
 
@@ -334,7 +351,6 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
       await qc.invalidateQueries({ queryKey: ["thread", sendThreadId] });
       qc.invalidateQueries({ queryKey: ["credits"] });
       qc.invalidateQueries({ queryKey: ["threads"] });
-
     } catch (e) {
       const err = e as Error;
       if (err.name !== "AbortError") toast.error(err.message);
@@ -374,7 +390,10 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
   }
 
   function toggleMic() {
-    const W = window as unknown as { SpeechRecognition?: SpeechRecognitionCtor; webkitSpeechRecognition?: SpeechRecognitionCtor };
+    const W = window as unknown as {
+      SpeechRecognition?: SpeechRecognitionCtor;
+      webkitSpeechRecognition?: SpeechRecognitionCtor;
+    };
     const SR = W.SpeechRecognition || W.webkitSpeechRecognition;
     if (!SR) return toast.error("Voice input not supported in this browser");
     if (listening) {
@@ -487,7 +506,12 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
     <AppShell>
       <div className="flex flex-col h-[calc(100vh-3.5rem)] md:h-screen">
         <div className="flex items-center gap-1 border-b border-border/50 p-2">
-          <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(true)} aria-label="Chats">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Chats"
+          >
             <Menu className="h-5 w-5" />
           </Button>
           <div className="flex-1 min-w-0 px-1">
@@ -503,7 +527,12 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
                   }}
                   className="h-8"
                 />
-                <Button size="sm" onClick={() => renameVal.trim() && renameMut.mutate(renameVal.trim())}>Save</Button>
+                <Button
+                  size="sm"
+                  onClick={() => renameVal.trim() && renameMut.mutate(renameVal.trim())}
+                >
+                  Save
+                </Button>
               </div>
             ) : (
               <div className="font-medium truncate">{title}</div>
@@ -514,7 +543,9 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Chat actions"><MoreVertical className="h-5 w-5" /></Button>
+              <Button variant="ghost" size="icon" aria-label="Chat actions">
+                <MoreVertical className="h-5 w-5" />
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setRenameVal(title)} disabled={!activeThreadId}>
@@ -535,21 +566,68 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
               </div>
             )}
             {messages.map((m) => (
-              <div key={m.id} className={`group flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div
+                key={m.id}
+                className={`group flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+              >
                 <div className="max-w-[85%]">
-                  <div className={`rounded-2xl px-4 py-3 ${m.role === "user" ? "gradient-bg text-primary-foreground" : "glass"}`}>
-                    {m.role === "assistant" ? <Markdown>{m.content}</Markdown> : <div className="text-sm whitespace-pre-wrap">{m.content}</div>}
+                  <div
+                    className={`rounded-2xl px-4 py-3 ${m.role === "user" ? "gradient-bg text-primary-foreground" : "glass"}`}
+                  >
+                    {m.role === "assistant" ? (
+                      <Markdown>{m.content}</Markdown>
+                    ) : (
+                      <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                    )}
                   </div>
                   <div className="mt-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button type="button" onClick={() => copyMsg(m.content)} className="text-xs text-muted-foreground hover:text-foreground p-1" aria-label="Copy"><Copy className="h-3.5 w-3.5" /></button>
-                    <button type="button" onClick={() => shareMsg(m.content)} className="text-xs text-muted-foreground hover:text-foreground p-1" aria-label="Share"><Share2 className="h-3.5 w-3.5" /></button>
+                    <button
+                      type="button"
+                      onClick={() => copyMsg(m.content)}
+                      className="text-xs text-muted-foreground hover:text-foreground p-1"
+                      aria-label="Copy"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => shareMsg(m.content)}
+                      className="text-xs text-muted-foreground hover:text-foreground p-1"
+                      aria-label="Share"
+                    >
+                      <Share2 className="h-3.5 w-3.5" />
+                    </button>
                     {m.role === "user" && (
-                      <button type="button" onClick={() => { setInput(m.content); textareaRef.current?.focus(); }} className="text-xs text-muted-foreground hover:text-foreground p-1" aria-label="Edit"><Pencil className="h-3.5 w-3.5" /></button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setInput(m.content);
+                          textareaRef.current?.focus();
+                        }}
+                        className="text-xs text-muted-foreground hover:text-foreground p-1"
+                        aria-label="Edit"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
                     )}
                     {m.role === "assistant" && (
-                      <button type="button" onClick={regenerate} className="text-xs text-muted-foreground hover:text-foreground p-1" aria-label="Regenerate"><RefreshCw className="h-3.5 w-3.5" /></button>
+                      <button
+                        type="button"
+                        onClick={regenerate}
+                        className="text-xs text-muted-foreground hover:text-foreground p-1"
+                        aria-label="Regenerate"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                      </button>
                     )}
-                    <button type="button" onClick={() => onDeleteMessage(m.id)} className="text-xs text-muted-foreground hover:text-destructive p-1" aria-label="Delete"><Trash2 className="h-3.5 w-3.5" /></button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteMessage(m.id)}
+                      className="text-xs text-muted-foreground hover:text-destructive p-1"
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -568,9 +646,18 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
                     <Markdown>{streaming}</Markdown>
                   ) : (
                     <div className="flex gap-1 items-center h-5" aria-label="AI is responding">
-                      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "0ms" }} />
-                      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "120ms" }} />
-                      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce" style={{ animationDelay: "240ms" }} />
+                      <span
+                        className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce"
+                        style={{ animationDelay: "0ms" }}
+                      />
+                      <span
+                        className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce"
+                        style={{ animationDelay: "120ms" }}
+                      />
+                      <span
+                        className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce"
+                        style={{ animationDelay: "240ms" }}
+                      />
                     </div>
                   )}
                 </div>
@@ -585,17 +672,40 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
             {image && (
               <div className="mb-2 relative inline-block">
                 <img src={image} alt="Attached preview" className="h-20 rounded-lg" />
-                <button type="button" onClick={() => { setImage(null); setAttachName(null); }} className="absolute -top-2 -right-2 bg-background border rounded-full p-1" aria-label="Remove attachment"><X className="h-3 w-3" /></button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImage(null);
+                    setAttachName(null);
+                  }}
+                  className="absolute -top-2 -right-2 bg-background border rounded-full p-1"
+                  aria-label="Remove attachment"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </div>
             )}
             {attachName && !image && (
               <div className="mb-2 inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-xs">
                 <FileText className="h-3.5 w-3.5" /> {attachName}
-                <button type="button" onClick={() => setAttachName(null)} aria-label="Remove attachment"><X className="h-3 w-3" /></button>
+                <button
+                  type="button"
+                  onClick={() => setAttachName(null)}
+                  aria-label="Remove attachment"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </div>
             )}
             <div className="glass rounded-3xl p-2 flex gap-1 items-end shadow-elegant">
-              <Button type="button" variant="ghost" size="icon" className="shrink-0 rounded-full" onClick={() => setSheetOpen(true)} aria-label="Attach">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="shrink-0 rounded-full"
+                onClick={() => setSheetOpen(true)}
+                aria-label="Attach"
+              >
                 <Plus className="h-5 w-5" />
               </Button>
               <Textarea
@@ -603,16 +713,34 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
                 autoFocus
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    send();
+                  }
+                }}
                 placeholder="Ask me anything..."
                 rows={1}
                 className="flex-1 border-0 bg-transparent resize-none focus-visible:ring-0 min-h-[40px] max-h-52 py-2"
               />
-              <Button type="button" variant="ghost" size="icon" onClick={toggleMic} className={`shrink-0 rounded-full ${listening ? "text-destructive" : ""}`} aria-label="Voice">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={toggleMic}
+                className={`shrink-0 rounded-full ${listening ? "text-destructive" : ""}`}
+                aria-label="Voice"
+              >
                 <Mic className="h-5 w-5" />
               </Button>
               {canSend && (
-                <Button size="icon" className="shrink-0 rounded-full gradient-bg text-primary-foreground border-0" disabled={pending} onClick={() => send()} aria-label="Send">
+                <Button
+                  size="icon"
+                  className="shrink-0 rounded-full gradient-bg text-primary-foreground border-0"
+                  disabled={pending}
+                  onClick={() => send()}
+                  aria-label="Send"
+                >
                   <Send className="h-4 w-4" />
                 </Button>
               )}
@@ -620,22 +748,58 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
           </div>
         </div>
 
-        <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={pickImage} />
-        <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={pickImage} />
-        <input ref={docRef} type="file" accept=".pdf,.docx,.txt,text/plain" className="hidden" onChange={pickDoc} />
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={pickImage}
+        />
+        <input
+          ref={galleryRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={pickImage}
+        />
+        <input
+          ref={docRef}
+          type="file"
+          accept=".pdf,.docx,.txt,text/plain"
+          className="hidden"
+          onChange={pickDoc}
+        />
 
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetContent side="bottom" className="rounded-t-3xl">
-            <SheetHeader><SheetTitle>Add attachment</SheetTitle></SheetHeader>
+            <SheetHeader>
+              <SheetTitle>Add attachment</SheetTitle>
+            </SheetHeader>
             <div className="grid grid-cols-3 gap-3 py-4">
-              <button type="button" onClick={() => cameraRef.current?.click()} className="flex flex-col items-center gap-2 p-4 rounded-2xl glass hover:bg-accent">
-                <Camera className="h-6 w-6" /><span className="text-sm">Camera</span>
+              <button
+                type="button"
+                onClick={() => cameraRef.current?.click()}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl glass hover:bg-accent"
+              >
+                <Camera className="h-6 w-6" />
+                <span className="text-sm">Camera</span>
               </button>
-              <button type="button" onClick={() => galleryRef.current?.click()} className="flex flex-col items-center gap-2 p-4 rounded-2xl glass hover:bg-accent">
-                <ImageIcon className="h-6 w-6" /><span className="text-sm">Gallery</span>
+              <button
+                type="button"
+                onClick={() => galleryRef.current?.click()}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl glass hover:bg-accent"
+              >
+                <ImageIcon className="h-6 w-6" />
+                <span className="text-sm">Gallery</span>
               </button>
-              <button type="button" onClick={() => docRef.current?.click()} className="flex flex-col items-center gap-2 p-4 rounded-2xl glass hover:bg-accent">
-                <FileText className="h-6 w-6" /><span className="text-sm">Document</span>
+              <button
+                type="button"
+                onClick={() => docRef.current?.click()}
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl glass hover:bg-accent"
+              >
+                <FileText className="h-6 w-6" />
+                <span className="text-sm">Document</span>
               </button>
             </div>
           </SheetContent>
@@ -643,12 +807,24 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
 
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <SheetContent side="left" className="w-80 p-0 flex flex-col">
-            <SheetHeader className="p-4 border-b"><SheetTitle>Your chats</SheetTitle></SheetHeader>
+            <SheetHeader className="p-4 border-b">
+              <SheetTitle>Your chats</SheetTitle>
+            </SheetHeader>
             <div className="p-3 space-y-2">
-              <Button onClick={startNewChat} className="w-full gap-2 gradient-bg text-primary-foreground border-0"><MessageSquarePlus className="h-4 w-4" /> New chat</Button>
+              <Button
+                onClick={startNewChat}
+                className="w-full gap-2 gradient-bg text-primary-foreground border-0"
+              >
+                <MessageSquarePlus className="h-4 w-4" /> New chat
+              </Button>
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search chats" className="pl-8" />
+                <Input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search chats"
+                  className="pl-8"
+                />
               </div>
             </div>
             <div className="flex-1 overflow-y-auto px-2 pb-4 space-y-1">
@@ -661,7 +837,9 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
                   className={`block rounded-lg px-3 py-2 hover:bg-accent ${t.id === activeThreadId ? "bg-accent" : ""}`}
                 >
                   <div className="text-sm font-medium truncate">{t.title}</div>
-                  <div className="text-xs text-muted-foreground">{new Date(t.updated_at).toLocaleDateString()}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(t.updated_at).toLocaleDateString()}
+                  </div>
                 </Link>
               ))}
               {filteredThreads.length === 0 && (
@@ -670,7 +848,9 @@ export function ChatScreen({ initialThreadId }: { initialThreadId?: string }) {
             </div>
             <div className="p-3 border-t">
               <Link to="/history" onClick={() => setDrawerOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start">History</Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  History
+                </Button>
               </Link>
             </div>
           </SheetContent>

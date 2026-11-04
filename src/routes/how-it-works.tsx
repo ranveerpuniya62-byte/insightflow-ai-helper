@@ -75,14 +75,14 @@ function HowItWorks() {
             <h2 className="font-semibold">Free daily credits</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Every account gets 10 AI chat messages, 10 homework questions, and 5 image credits
-              (analysis + generation combined) each day. Credits reset automatically every 24
-              hours — just come back tomorrow and continue.
+              (analysis + generation combined) each day. Credits reset automatically every 24 hours
+              — just come back tomorrow and continue.
             </p>
             <h2 className="mt-6 font-semibold">Your history stays yours</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Every conversation, homework session, and generated image is saved to your History
-              so you can revisit, rename, or delete it anytime. Your content is private to your
-              account — see our{" "}
+              Every conversation, homework session, and generated image is saved to your History so
+              you can revisit, rename, or delete it anytime. Your content is private to your account
+              — see our{" "}
               <Link to="/privacy" className="text-primary underline">
                 Privacy Policy
               </Link>

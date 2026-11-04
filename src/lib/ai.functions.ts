@@ -39,14 +39,21 @@ export const answerHomework = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => HomeworkSchema.parse(v))
   .handler(async ({ data, context }) => {
-    const { data: consumed, error: cErr } = await context.supabase.rpc("consume_credit", { _uid: context.userId, _kind: "homework" });
+    const { data: consumed, error: cErr } = await context.supabase.rpc("consume_credit", {
+      _uid: context.userId,
+      _kind: "homework",
+    });
     if (cErr) {
-      if (cErr.message.includes("no_credits")) throw new Error("You've used all your daily homework credits. They reset every 24 hours.");
+      if (cErr.message.includes("no_credits"))
+        throw new Error("You've used all your daily homework credits. They reset every 24 hours.");
       throw new Error(cErr.message);
     }
 
-    const userContent: unknown[] = [{ type: "text", text: `Subject: ${data.subject}\n\nQuestion:\n${data.question}` }];
-    if (data.imageDataUrl) userContent.push({ type: "image_url", image_url: { url: data.imageDataUrl } });
+    const userContent: unknown[] = [
+      { type: "text", text: `Subject: ${data.subject}\n\nQuestion:\n${data.question}` },
+    ];
+    if (data.imageDataUrl)
+      userContent.push({ type: "image_url", image_url: { url: data.imageDataUrl } });
 
     const answer = await callAI({
       messages: [
@@ -56,39 +63,58 @@ export const answerHomework = createServerFn({ method: "POST" })
     });
 
     await context.supabase.from("history_items").insert({
-      user_id: context.userId, kind: "homework",
+      user_id: context.userId,
+      kind: "homework",
       title: data.question.slice(0, 80),
-      payload: { subject: data.subject, question: data.question, answer, hasImage: !!data.imageDataUrl },
+      payload: {
+        subject: data.subject,
+        question: data.question,
+        answer,
+        hasImage: !!data.imageDataUrl,
+      },
     });
 
     return { answer, credits: consumed };
   });
 
-const AnalyzeSchema = z.object({ imageDataUrl: z.string().min(20), prompt: z.string().max(1000).optional() });
+const AnalyzeSchema = z.object({
+  imageDataUrl: z.string().min(20),
+  prompt: z.string().max(1000).optional(),
+});
 
 export const analyzeImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => AnalyzeSchema.parse(v))
   .handler(async ({ data, context }) => {
-    const { data: consumed, error: cErr } = await context.supabase.rpc("consume_credit", { _uid: context.userId, _kind: "image" });
+    const { data: consumed, error: cErr } = await context.supabase.rpc("consume_credit", {
+      _uid: context.userId,
+      _kind: "image",
+    });
     if (cErr) {
-      if (cErr.message.includes("no_credits")) throw new Error("You've used all your daily image credits.");
+      if (cErr.message.includes("no_credits"))
+        throw new Error("You've used all your daily image credits.");
       throw new Error(cErr.message);
     }
     const answer = await callAI({
       messages: [
         { role: "system", content: analyzeSystemPrompt() },
-        { role: "user", content: [
-          { type: "text", text: data.prompt || "Please analyze this image and explain everything relevant." },
-          { type: "image_url", image_url: { url: data.imageDataUrl } },
-        ] },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: data.prompt || "Please analyze this image and explain everything relevant.",
+            },
+            { type: "image_url", image_url: { url: data.imageDataUrl } },
+          ],
+        },
       ],
     });
     await context.supabase.from("history_items").insert({
-      user_id: context.userId, kind: "analysis",
+      user_id: context.userId,
+      kind: "analysis",
       title: (data.prompt || "Image analysis").slice(0, 80),
       payload: { prompt: data.prompt, answer },
     });
     return { answer, credits: consumed };
   });
-

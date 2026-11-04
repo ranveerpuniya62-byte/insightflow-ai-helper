@@ -17,7 +17,8 @@ function ResetPage() {
   const navigate = useNavigate();
 
   async function handle(e: React.FormEvent) {
-    e.preventDefault(); setLoading(true);
+    e.preventDefault();
+    setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (error) return toast.error(error.message);
@@ -29,8 +30,19 @@ function ResetPage() {
     <div className="min-h-screen grid place-items-center px-4">
       <form onSubmit={handle} className="w-full max-w-md glass rounded-2xl p-8 space-y-4">
         <h1 className="text-2xl font-bold">Set a new password</h1>
-        <div><Label>New password</Label><Input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} /></div>
-        <Button type="submit" disabled={loading} className="w-full gradient-bg text-white border-0">Update password</Button>
+        <div>
+          <Label>New password</Label>
+          <Input
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <Button type="submit" disabled={loading} className="w-full gradient-bg text-white border-0">
+          Update password
+        </Button>
       </form>
     </div>
   );

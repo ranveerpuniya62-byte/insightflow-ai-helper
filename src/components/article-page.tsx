@@ -2,13 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { SiteNav } from "./site-nav";
 import { SiteFooter } from "./site-footer";
 
-export function ArticlePage({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+export function ArticlePage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteNav />

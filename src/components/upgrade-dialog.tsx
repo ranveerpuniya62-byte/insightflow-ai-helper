@@ -1,4 +1,11 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { Hourglass } from "lucide-react";
@@ -20,11 +27,14 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
             </div>
             <DialogTitle className="text-center text-2xl">Daily Limit Reached</DialogTitle>
             <DialogDescription className="text-center">
-              You have used your free daily limit. Please wait until your daily credits reset — they refresh automatically every 24 hours.
+              You have used your free daily limit. Please wait until your daily credits reset — they
+              refresh automatically every 24 hours.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col sm:flex-col gap-2">
-            <Button variant="ghost" className="w-full" onClick={() => setOpen(false)}>OK</Button>
+            <Button variant="ghost" className="w-full" onClick={() => setOpen(false)}>
+              OK
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

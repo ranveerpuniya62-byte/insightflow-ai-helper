@@ -37,7 +37,9 @@ export const Route = createFileRoute("/api/chat")({
         } catch {
           return new Response("Bad request", { status: 400 });
         }
-        const content = String(body.content ?? "").slice(0, 8000).trim();
+        const content = String(body.content ?? "")
+          .slice(0, 8000)
+          .trim();
         const threadId = String(body.threadId ?? "");
         if (!content || !threadId) return new Response("Bad request", { status: 400 });
 
@@ -55,7 +57,10 @@ export const Route = createFileRoute("/api/chat")({
           if (createThreadError) return new Response(createThreadError.message, { status: 500 });
         }
 
-        const { error: cErr } = await supabase.rpc("consume_credit", { _uid: userId, _kind: "chat" });
+        const { error: cErr } = await supabase.rpc("consume_credit", {
+          _uid: userId,
+          _kind: "chat",
+        });
         if (cErr) {
           const msg = cErr.message.includes("no_credits")
             ? "Daily chat credits exhausted. They reset every 24 hours."
@@ -64,13 +69,20 @@ export const Route = createFileRoute("/api/chat")({
         }
 
         const { error: userMessageError } = await supabase.from("chat_messages").insert({
-          thread_id: threadId, user_id: userId, role: "user", content,
+          thread_id: threadId,
+          user_id: userId,
+          role: "user",
+          content,
         });
         if (userMessageError) return new Response(userMessageError.message, { status: 500 });
 
-        const { data: history } = await supabase.from("chat_messages")
-          .select("role,content").eq("thread_id", threadId).eq("user_id", userId)
-          .order("created_at").limit(30);
+        const { data: history } = await supabase
+          .from("chat_messages")
+          .select("role,content")
+          .eq("thread_id", threadId)
+          .eq("user_id", userId)
+          .order("created_at")
+          .limit(30);
 
         const messages: unknown[] = [
           { role: "system", content: chatSystemPrompt() },
@@ -78,8 +90,14 @@ export const Route = createFileRoute("/api/chat")({
         ];
         messages.push(
           body.imageDataUrl
-            ? { role: "user", content: [{ type: "text", text: content }, { type: "image_url", image_url: { url: body.imageDataUrl } }] }
-            : { role: "user", content }
+            ? {
+                role: "user",
+                content: [
+                  { type: "text", text: content },
+                  { type: "image_url", image_url: { url: body.imageDataUrl } },
+                ],
+              }
+            : { role: "user", content },
         );
 
         const MODELS = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
@@ -91,14 +109,16 @@ export const Route = createFileRoute("/api/chat")({
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey}` },
             body: JSON.stringify({ model, messages, stream: true }),
           });
-          if (r.ok && r.body) { upstream = r; break; }
+          if (r.ok && r.body) {
+            upstream = r;
+            break;
+          }
           lastErr = await r.text();
           if (r.status === 402 || r.status === 401 || r.status === 400) {
             return new Response(lastErr || "Upstream error", { status: r.status });
           }
         }
         if (!upstream) return new Response(lastErr || "Upstream error", { status: 502 });
-
 
         const stream = new ReadableStream<Uint8Array>({
           async start(controller) {
@@ -126,17 +146,28 @@ export const Route = createFileRoute("/api/chat")({
                       full += delta;
                       controller.enqueue(encoder.encode(delta));
                     }
-                  } catch { /* ignore malformed chunk */ }
+                  } catch {
+                    /* ignore malformed chunk */
+                  }
                 }
               }
 
               if (full) {
                 await supabase.from("chat_messages").insert({
-                  thread_id: threadId, user_id: userId, role: "assistant", content: full,
+                  thread_id: threadId,
+                  user_id: userId,
+                  role: "assistant",
+                  content: full,
                 });
-                const { data: msgs } = await supabase.from("chat_messages")
-                  .select("id").eq("thread_id", threadId).order("created_at").limit(3);
-                const patch: { updated_at: string; title?: string } = { updated_at: new Date().toISOString() };
+                const { data: msgs } = await supabase
+                  .from("chat_messages")
+                  .select("id")
+                  .eq("thread_id", threadId)
+                  .order("created_at")
+                  .limit(3);
+                const patch: { updated_at: string; title?: string } = {
+                  updated_at: new Date().toISOString(),
+                };
                 if ((msgs?.length ?? 0) <= 3) patch.title = content.slice(0, 60);
                 await supabase.from("chat_threads").update(patch).eq("id", threadId);
               }

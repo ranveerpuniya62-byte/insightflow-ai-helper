@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { CookieConsent } from "@/components/cookie-consent";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeProvider } from "@/lib/theme";
 import { UpgradeProvider } from "@/components/upgrade-dialog";
@@ -29,7 +30,10 @@ function NotFoundComponent() {
         <p className="mt-2 text-sm text-muted-foreground">
           This page went off to study. Let's get you back on track.
         </p>
-        <Link to="/" className="mt-6 inline-flex rounded-md gradient-bg px-4 py-2 text-sm font-medium text-white">
+        <Link
+          to="/"
+          className="mt-6 inline-flex rounded-md gradient-bg px-4 py-2 text-sm font-medium text-white"
+        >
           Back home
         </Link>
       </div>
@@ -50,10 +54,17 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
         <p className="mt-2 text-sm text-muted-foreground">Try again or head home.</p>
         <div className="mt-6 flex justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="rounded-md gradient-bg px-4 py-2 text-sm font-medium text-white"
-          >Try again</button>
-          <a href="/" className="rounded-md border px-4 py-2 text-sm font-medium">Home</a>
+          >
+            Try again
+          </button>
+          <a href="/" className="rounded-md border px-4 py-2 text-sm font-medium">
+            Home
+          </a>
         </div>
       </div>
     </div>
@@ -66,7 +77,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "AI Study Chat — Your AI-powered study companion" },
-      { name: "description", content: "Chat with AI, get step-by-step homework help, analyze images, and generate study visuals. Fast, free, and built for learners." },
+      {
+        name: "description",
+        content:
+          "Chat with AI, get step-by-step homework help, analyze images, and generate study visuals. Fast, free, and built for learners.",
+      },
       { name: "author", content: "AI Study Chat" },
       { name: "theme-color", content: "#7c3aed" },
       { name: "application-name", content: "AI Study Chat" },
@@ -75,13 +90,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "mobile-web-app-capable", content: "yes" },
       { property: "og:title", content: "AI Study Chat — Your AI-powered study companion" },
-      { property: "og:description", content: "Chat with AI, get step-by-step homework help, analyze images, and generate study visuals. Fast, free, and built for learners." },
+      {
+        property: "og:description",
+        content:
+          "Chat with AI, get step-by-step homework help, analyze images, and generate study visuals. Fast, free, and built for learners.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "AI Study Chat — Your AI-powered study companion" },
-      { name: "twitter:description", content: "Chat with AI, get step-by-step homework help, analyze images, and generate study visuals. Fast, free, and built for learners." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d7736569-fbee-49a9-84f0-94396d76cc81/id-preview-9d3dfbc1--1f24ed2c-3b05-406c-b861-b6105bc355a5.lovable.app-1784019903801.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d7736569-fbee-49a9-84f0-94396d76cc81/id-preview-9d3dfbc1--1f24ed2c-3b05-406c-b861-b6105bc355a5.lovable.app-1784019903801.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Chat with AI, get step-by-step homework help, analyze images, and generate study visuals. Fast, free, and built for learners.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d7736569-fbee-49a9-84f0-94396d76cc81/id-preview-9d3dfbc1--1f24ed2c-3b05-406c-b861-b6105bc355a5.lovable.app-1784019903801.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d7736569-fbee-49a9-84f0-94396d76cc81/id-preview-9d3dfbc1--1f24ed2c-3b05-406c-b861-b6105bc355a5.lovable.app-1784019903801.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -89,15 +120,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/icon-192.png", type: "image/png", sizes: "192x192" },
       { rel: "icon", href: "/icon-512.png", type: "image/png", sizes: "512x512" },
       { rel: "apple-touch-icon", href: "/icon-192.png", sizes: "192x192" },
-           { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
-    scripts: [
-      {
-        async: true,
-        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2010039359139196",
-        crossOrigin: "anonymous",
-      },
-    ],
+    scripts: [],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -116,7 +141,10 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body>{children}<Scripts /></body>
+      <body>
+        {children}
+        <Scripts />
+      </body>
     </html>
   );
 }
@@ -132,13 +160,27 @@ function RootComponent() {
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
-  useEffect(() => { registerServiceWorker(); }, []);
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+  // Load AdSense after hydration: injecting it through SSR head() lets Google's
+  // managed script rewrite the <head> before React hydrates, which failed
+  // hydration on every page and forced a full client re-render.
+  useEffect(() => {
+    if (document.querySelector('script[src*="adsbygoogle"]')) return;
+    const s = document.createElement("script");
+    s.async = true;
+    s.crossOrigin = "anonymous";
+    s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2010039359139196";
+    document.head.appendChild(s);
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <UpgradeProvider>
           <Outlet />
           <Toaster position="top-center" richColors />
+          <CookieConsent />
         </UpgradeProvider>
       </ThemeProvider>
     </QueryClientProvider>

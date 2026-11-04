@@ -38,7 +38,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setResolved(apply(t));
   }
 
-  return <ThemeContext.Provider value={{ theme, setTheme, resolved }}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme, resolved }}>{children}</ThemeContext.Provider>
+  );
 }
 
 export const useTheme = () => useContext(ThemeContext);
