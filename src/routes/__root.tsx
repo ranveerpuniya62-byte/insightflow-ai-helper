@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { CookieConsent } from "@/components/cookie-consent";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeProvider } from "@/lib/theme";
 import { UpgradeProvider } from "@/components/upgrade-dialog";
@@ -162,12 +163,24 @@ function RootComponent() {
   useEffect(() => {
     registerServiceWorker();
   }, []);
+  // Load AdSense after hydration: injecting it through SSR head() lets Google's
+  // managed script rewrite the <head> before React hydrates, which failed
+  // hydration on every page and forced a full client re-render.
+  useEffect(() => {
+    if (document.querySelector('script[src*="adsbygoogle"]')) return;
+    const s = document.createElement("script");
+    s.async = true;
+    s.crossOrigin = "anonymous";
+    s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2010039359139196";
+    document.head.appendChild(s);
+  }, []);
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <UpgradeProvider>
           <Outlet />
           <Toaster position="top-center" richColors />
+          <CookieConsent />
         </UpgradeProvider>
       </ThemeProvider>
     </QueryClientProvider>

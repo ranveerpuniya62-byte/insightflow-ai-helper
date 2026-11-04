@@ -14,6 +14,16 @@ export function SiteFooter() {
           <div className="font-medium mb-2">Product</div>
           <ul className="space-y-1 text-muted-foreground">
             <li>
+              <Link to="/study-tips" className="hover:text-foreground">
+                Study Tips
+              </Link>
+            </li>
+            <li>
+              <Link to="/how-it-works" className="hover:text-foreground">
+                How it Works
+              </Link>
+            </li>
+            <li>
               <Link to="/auth" className="hover:text-foreground">
                 Sign in
               </Link>
