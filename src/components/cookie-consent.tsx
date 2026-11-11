@@ -29,13 +29,13 @@ export function CookieConsent() {
     <div
       role="dialog"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-background/95 backdrop-blur shadow-elegant"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-background/95 backdrop-blur shadow-elegant"
     >
-      <div className="mx-auto flex max-w-4xl flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="pointer-events-none mx-auto flex max-w-4xl flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs leading-relaxed text-muted-foreground">
           We use essential cookies to keep you signed in and remember your preferences, plus
           anonymous analytics to improve the app. Read our{" "}
-          <Link to="/cookies" className="text-primary underline">
+          <Link to="/cookies" className="pointer-events-auto text-primary underline">
             Cookie Policy
           </Link>
           .
@@ -43,13 +43,13 @@ export function CookieConsent() {
         <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => choose("rejected")}
-            className="rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-accent/50"
+            className="pointer-events-auto rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-accent/50"
           >
             Decline
           </button>
           <button
             onClick={() => choose("accepted")}
-            className="rounded-md gradient-bg px-3 py-1.5 text-xs font-medium text-white border-0"
+            className="pointer-events-auto rounded-md gradient-bg px-3 py-1.5 text-xs font-medium text-white border-0"
           >
             Accept all
           </button>
