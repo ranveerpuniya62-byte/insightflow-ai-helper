@@ -29,9 +29,9 @@ export function CookieConsent() {
     <div
       role="dialog"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-background/95 backdrop-blur shadow-elegant"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-background/95 backdrop-blur shadow-elegant"
     >
-      <div className="mx-auto flex max-w-4xl flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="pointer-events-auto mx-auto flex max-w-4xl flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs leading-relaxed text-muted-foreground">
           We use essential cookies to keep you signed in and remember your preferences, plus
           anonymous analytics to improve the app. Read our{" "}
