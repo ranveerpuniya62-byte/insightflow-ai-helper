@@ -28,7 +28,9 @@ function Contact() {
       toast.success("Thanks — we'll be in touch");
       setF({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Unable to send your message. Please try again.");
+      toast.error(
+        error instanceof Error ? error.message : "Unable to send your message. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
