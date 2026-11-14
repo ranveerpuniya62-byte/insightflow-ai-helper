@@ -1,6 +1,7 @@
 # Project notes
 
 - Deployment: `netlify.toml` configures an external full-stack Netlify deploy (`npm run build`, publish `dist`, Nitro `netlify` preset). Do not add a static `/* /index.html` SPA redirect or change the publish dir to `dist/client` — the app runs server functions/SSR and Nitro writes its own redirects. External deploys need Netlify env vars: `VITE_SUPABASE_*` (build), `SUPABASE_URL`/`SUPABASE_PUBLISHABLE_KEY` and `LOVABLE_API_KEY` (server).
+- Public contact submissions are validated and inserted through a server function using the publishable key, keeping the browser away from direct writes while preserving the table's insert-only RLS policy.
 
 <!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
